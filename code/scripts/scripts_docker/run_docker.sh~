@@ -1,0 +1,11 @@
+SCRIPTPATH="/home/chunyuan/azure_mounts/textae_azure"
+IMAGE=chunyl/pytorch-transformers:v1
+
+docker run \
+--runtime=nvidia \
+-it --rm \
+--net host \
+--volume $SCRIPTPATH:/workspace \
+--interactive --tty $IMAGE /bin/bash
+
+
