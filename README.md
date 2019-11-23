@@ -41,10 +41,12 @@ Following HuggingFace repo, before running anyone of GLUE tasks, you should down
 Let's take QNLI for example (104k training instances, 5.4k validation instances). You should be able to see the following accuracy by run the scripts:
  
 Optimus: acc = 0.7062
+
     sh scripts/scripts_local/run_vae_glue.sh
 
 
 BERT: acc = 0.6624
+
     sh scripts/scripts_local/run_bert_glue.sh
 
  
