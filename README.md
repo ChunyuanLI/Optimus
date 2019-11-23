@@ -5,7 +5,9 @@
 ### Outline
 
 `code`: code and scripts to run the project in different computing environments
+
 `output`: checkpoints to save models and intermediate results (including our pre-trained models).
+
 `data`: various datasets and pre-processed versions.
 
 
@@ -25,7 +27,8 @@ Edit the project path to the absolute path on your computer by changing the "SCR
 
 CD into the directory "code", and run docker
 
- sh scripts/scripts_docker/run_docker.sh
+    sh scripts/scripts_docker/run_docker.sh
+  
 
 ### Download GLUE datasets
 
@@ -38,11 +41,12 @@ Following HuggingFace repo, before running anyone of GLUE tasks, you should down
 Let's take QNLI for example (104k training instances, 5.4k validation instances). You should be able to see the following accuracy by run the scripts:
  
 Optimus: acc = 0.7062
+    sh scripts/scripts_local/run_vae_glue.sh
 
- sh scripts/scripts_local/run_vae_glue.sh
 
 BERT: acc = 0.6624
+    sh scripts/scripts_local/run_bert_glue.sh
 
- sh scripts/scripts_local/run_bert_glue.sh
+ 
 
 
