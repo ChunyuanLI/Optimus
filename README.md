@@ -13,6 +13,31 @@ This repository contains source code necessary to reproduce the results presente
 
 For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
 
+## Contents
+There are four steps to use this codebase to reproduce the results in the paper.
+
+1. [Dependencies](#dependencies)
+2. [Prepare datasets](#prepare-datasets)
+3. [Model training](#Model-training)
+    1. Pre-training on setences in Wikipedia
+    2. Languange Modeling
+    3. Guided Language Generation
+    4. Low-resource Language Understanding
+4. [Collect and plot results](#collect-and-plot-results)
+
+
+### Dependencies
+
+
+### Prepare Datasets
+
+
+### Model Training
+
+
+### Collect and Plot Results
+
+
 ### Outline
 
 `code`: code and scripts to run the project in different computing environments
