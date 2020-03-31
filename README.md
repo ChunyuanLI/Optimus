@@ -12,15 +12,6 @@ This repository contains source code necessary to reproduce the results presente
 For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
 
 
-```
-@inproceedings{li2020_Optimus,
-  title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
-  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao, Jianfeng},
-  booktitle={arXiv},
-  year={2020}
-}
-```
-
 
 
 ## Contents
@@ -78,4 +69,15 @@ code. Note that without modification, we have copyed our extracted results into 
 ## Questions?
 
 Please drop me ([Chunyuan](http://chunyuan.li/)) a line if you have any questions.
+
+
+```
+@inproceedings{li2020_Optimus,
+  title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
+  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao, Jianfeng},
+  booktitle={arXiv},
+  year={2020}
+}
+```
+
 
