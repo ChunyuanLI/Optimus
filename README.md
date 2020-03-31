@@ -13,7 +13,7 @@ This repository contains source code necessary to reproduce the results presente
 ```
 
 
-|<img src="doc/figs/optimus_scheme.png" width="300"> | <img src="doc/figs/headfig_optimus.png" width="500"> 
+|<img src="doc/figs/optimus_scheme.png" width="300"> | <img src="doc/figs/headfig_optimus.png" width="400"> 
 |-------------------------|:-------------------------:|
 | The network architecture of Optimus: encoder for representation learning and decoder for language generation  | Sentences are organized and manipulated in a pre-trained latent space
 
