@@ -5,7 +5,7 @@ This repository contains source code necessary to reproduce the results presente
 ```
 @inproceedings{li2020_Optimus,
   title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
-  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao Jianfeng},
+  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao, Jianfeng},
   booktitle={arXiv},
   year={2020}
 }
