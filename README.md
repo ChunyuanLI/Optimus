@@ -3,6 +3,15 @@
 
 This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/):
 
+
+|<img src="doc/figs/optimus_scheme.png" width="350"> | <img src="doc/figs/headfig_optimus.png" width="800"> 
+|-------------------------|:-------------------------:|
+| The network architecture of Optimus: encoder for representation learning and decoder for generation  | Sentences are organized and manipulated in a pre-trained latent space
+
+
+For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
+
+
 ```
 @inproceedings{li2020_Optimus,
   title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
@@ -12,13 +21,6 @@ This repository contains source code necessary to reproduce the results presente
 }
 ```
 
-
-|<img src="doc/figs/optimus_scheme.png" width="350"> | <img src="doc/figs/headfig_optimus.png" width="800"> 
-|-------------------------|:-------------------------:|
-| The network architecture of Optimus: encoder for representation learning and decoder for generation  | Sentences are organized and manipulated in a pre-trained latent space
-
-
-For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
