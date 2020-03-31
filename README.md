@@ -27,7 +27,7 @@ There are four steps to use this codebase to reproduce the results in the paper.
 4. [Collect and plot results](#collect-and-plot-results)
 
 
-### Dependencies
+## Dependencies
 
 Pull docker from Docker Hub at: chunyl/pytorch-transformers:v2
 
@@ -38,11 +38,11 @@ CD into the directory "code", and run docker
     sh scripts/scripts_docker/run_docker.sh
   
 
-### Prepare Datasets
+## Prepare Datasets
 
 Please the data preparation at links:
 
-### Model Training
+## Model Training
 
 **1. Pre-training on setences in Wikipedia**
 
@@ -52,7 +52,7 @@ Please the data preparation at links:
 
 **4. Low-resource Language Understanding**
 
-### Collect and Plot Results
+## Collect and Plot Results
 
 Once the networks are trained and the results are saved, we extracted key results using Python script. The results can be plotted using the included IPython notebook `plots/main_plots.ipynb`.
 Start the IPython Notebook server:
