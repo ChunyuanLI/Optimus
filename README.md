@@ -1,6 +1,5 @@
-# Optimus
+# <img src="doc/figs/logo_optimus.png" width="100">  Optimus: the first large-scale pre-trained VAE language model 
 
-# Optimus
 
 This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/):
 
@@ -14,6 +13,59 @@ This repository contains source code necessary to reproduce the results presente
 ```
 
 For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
+
+<img src="doc/figs/optimus_scheme.png" width="300"> 
+<img src="doc/figs/headfig_optimus.png" width="300"> 
+
+
+## Contents
+There are four steps to use this codebase to reproduce the results in the paper.
+
+1. [Dependencies](#dependencies)
+2. [Prepare datasets](#prepare-datasets)
+3. [Model training](#Model-training)
+    1. Pre-training on setences in Wikipedia
+    2. Languange Modeling
+    3. Guided Language Generation
+    4. Low-resource Language Understanding
+4. [Collect and plot results](#collect-and-plot-results)
+
+
+### Dependencies
+
+
+### Prepare Datasets
+
+
+### Model Training
+
+**1. Pre-training on setences in Wikipedia**
+
+**2. Languange Modeling**
+
+**3. Guided Language Generation**
+
+**4. Low-resource Language Understanding**
+
+### Collect and Plot Results
+
+Once the networks are trained and the results are saved, we extracted key results using Python script. The results can be plotted using the included IPython notebook `plots/main_plots.ipynb`.
+Start the IPython Notebook server:
+
+```
+$ cd plots
+$ ipython notebook
+```
+
+Select the `main_plots.ipynb` notebook and execute the included
+code. Note that without modification, we have copyed our extracted results into the notebook, and script will output figures in the paper. If you've run your own training and wish to plot results, you'll have to organize your results in the same format instead.
+
+
+## Questions?
+
+Please drop me ([Chunyuan](http://chunyuan.li/)) a line if you have any questions.
+
+
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
