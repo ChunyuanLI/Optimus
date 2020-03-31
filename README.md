@@ -38,6 +38,11 @@ There are four steps to use this codebase to reproduce the results in the paper.
 ### Collect and Plot Results
 
 
+## Questions?
+
+Please drop me ([Chunyuan](http://chunyuan.li/)) a line if you have any questions.
+
+
 ### Outline
 
 `code`: code and scripts to run the project in different computing environments
