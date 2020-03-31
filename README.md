@@ -34,8 +34,26 @@ There are four steps to use this codebase to reproduce the results in the paper.
 
 ### Model Training
 
+**1. Pre-training on setences in Wikipedia**
+
+**2. Languange Modeling**
+
+**3. Guided Language Generation**
+
+**4. Low-resource Language Understanding**
 
 ### Collect and Plot Results
+
+Once the networks are trained and the results are saved, we extracted key results using Python script. The results can be plotted using the included IPython notebook `plots/main_plots.ipynb`.
+Start the IPython Notebook server:
+
+```
+$ cd plots
+$ ipython notebook
+```
+
+Select the `main_plots.ipynb` notebook and execute the included
+code. Note that without modification, we have copyed our extracted results into the notebook, and script will output figures in the paper. If you've run your own training and wish to plot results, you'll have to organize your results in the same format instead.
 
 
 ## Questions?
