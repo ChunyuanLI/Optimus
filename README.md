@@ -22,9 +22,6 @@ For more on this project, see the [Microsoft Research Blog post](https://www.mic
 ```
 
 
-## Contents
-There are four steps to use this codebase to reproduce the results in the paper.
-
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
