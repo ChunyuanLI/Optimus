@@ -1,6 +1,17 @@
 # Optimus
 
+This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/):
 
+```
+@inproceedings{li2020_Optimus,
+  title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
+  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao Jianfeng},
+  booktitle={arXiv},
+  year={2020}
+}
+```
+
+For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
 
 ### Outline
 
