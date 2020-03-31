@@ -1,4 +1,4 @@
-# <img src="doc/figs/logo_optimus.png" width="80">  Optimus: the first pre-trained big VAE language model 
+# <img src="doc/figs/logo_optimus.png" width="80">  Optimus: The first pre-trained big VAE language model 
 
 
 This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/):
@@ -12,11 +12,13 @@ This repository contains source code necessary to reproduce the results presente
 }
 ```
 
+
+|<img src="doc/figs/optimus_scheme.png" width="300"> | <img src="doc/figs/headfig_optimus.png" width="500"> 
+|-------------------------|:-------------------------:|
+| The network architecture of Optimus: encoder for representation learning and decoder for language generation  | Sentences are organized and manipulated in a pre-trained latent space
+
+
 For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/).
-
-<img src="doc/figs/optimus_scheme.png" width="400"> 
-<img src="doc/figs/headfig_optimus.png" width="400"> 
-
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
