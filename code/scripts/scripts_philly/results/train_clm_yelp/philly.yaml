@@ -1,0 +1,66 @@
+version: 4.1.8
+dry_run: false
+exp_name: train_clm_yelp
+description: Train Causal LM on Yelp Dataset
+timestamp: '2019-09-20T23:20:36.985656-07:00'
+auth:
+  cluster: cam
+  vc: msrlabs
+  docker:
+    registry: index.docker.io
+    image: chunyl/pytorch-transformers:v0
+code:
+  local_dir: /home/chunyl/azure_mounts/textae_azure/code/scripts/scripts_philly/code
+  remote_dir: code/
+  code_zip: false
+  storage_id: _default
+data:
+  storage_id: _default
+search:
+  type: grid
+  max_trials: 20
+  params:
+  - name: bs_option
+    spec: discrete
+    values:
+    - 1
+  job_template:
+    name: vq_{experiment_name:s}_{bs_option:.0f}
+    sku: G4
+    sku_count: 1
+    command:
+    - pip install --user --editable .
+    - python examples/run_lm_finetuning.py --output_dir ../output/philly_clm_yelp_gpt2
+      --model_type gpt2 --model_name_or_path gpt2  --do_train --train_data_file ../data/datasets/yelp_data/train.txt
+      --do_eval --eval_data_file ../data/datasets/yelp_data/valid.txt --per_gpu_train_batch_size
+      {bs_option} --overwrite_output_dir
+    submit_args: {}
+    tags: []
+    type: bash
+jobs:
+- name: vq_train_clm_yelp_1_abcd
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - python examples/run_lm_finetuning.py --output_dir ../output/philly_clm_yelp_gpt2
+    --model_type gpt2 --model_name_or_path gpt2  --do_train --train_data_file ../data/datasets/yelp_data/train.txt
+    --do_eval --eval_data_file ../data/datasets/yelp_data/valid.txt --per_gpu_train_batch_size
+    1 --overwrite_output_dir
+  id: application_1569000762026_0101
+  results_dir: /mnt/_output/pt-results/2019-09-20/application_1569000762026_0101
+  submit_args: {}
+  tags: []
+  type: bash
+storage:
+  info:
+    _default:
+      use_phillyfs: false
+      storage_account_name: textae
+      mount_path: /mnt/_default
+      container_name: bigtextae
+    _output:
+      use_phillyfs: false
+      storage_account_name: textae
+      mount_path: /mnt/_output
+      container_name: bigtextae

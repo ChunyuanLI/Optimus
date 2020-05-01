@@ -485,7 +485,7 @@ def main():
     
 
     global_step = args.gloabl_step_eval
-    encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}-1.0'.format(global_step))
+    encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}'.format(global_step))
 
     ## Encoder 
     args.model_type = args.model_type.lower()

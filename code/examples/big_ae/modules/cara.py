@@ -64,7 +64,7 @@ class CARA(nn.Module):
         # Generate z
         gen_z = self.latent_generator(random_noise)  # (B, nz)
 
-        # Latent discriminator
+        #################### Latent discriminator for sampling from a simple distribution #################### 
         prob_encode_z_dis = self.latent_discriminator(latent_z).squeeze(1).float()  # (B)
         prob_gen_z_dis = self.latent_discriminator(gen_z).squeeze(1).float()  # (B)
         # Train latent discriminator
@@ -74,7 +74,7 @@ class CARA(nn.Module):
         # Train sampler adversarially
         loss_lsg = self.BCEWithLogitsLoss(prob_gen_z_dis, ones_label)
 
-        # Latent classifier
+        ####################  Latent classifier for disentanglement #################### 
         prob_encode_z_cls = self.latent_classifier(latent_z)  # (B, n_labels)
         if self.args.label_size <= 2:
             prob_encode_z_cls = prob_encode_z_cls.squeeze(1)  # (B)
@@ -90,28 +90,33 @@ class CARA(nn.Module):
             # Train encoder adversarially
             loss_encoder = 1 - self.CrossEntropyLoss(prob_encode_z_cls, cond_labels)
 
+
+        #################### Recontruction loss with latent z and label emb #################### 
         # Embed labels
         label_emb = self.label_embedding(cond_labels)  # (B, hidden_size)
-        past_label = self.decoder.linear(label_emb)    # (B, n_blocks * hidden_size)  # todo: use the same linear layer for latent_z for now.
+        # past_label = self.decoder.linear(label_emb)    # (B, n_blocks * hidden_size)  # todo: use the same linear layer for latent_z for now.
         if self.args.label_size <= 2:
             sampled_cond_labels = 1 - cond_labels
         else:
             raise NotImplementedError    # todo: currently only implemented for binary labels. need to change for multi-class labels.
         sampled_label_emb = self.label_embedding(sampled_cond_labels)  # (B, hidden_size)
-        past_sampled_label = self.decoder.linear(sampled_label_emb)    # (B, n_blocks * hidden_size)  # todo: use the same linear layer for latent_z for now.
+        # past_sampled_label = self.decoder.linear(sampled_label_emb)    # (B, n_blocks * hidden_size)  # todo: use the same linear layer for latent_z for now.
+        past_sampled_label = sampled_label_emb
 
         # Generate based on encoded z and gt labels. (reconstruction)
-        past_z = self.decoder.linear(latent_z)    # (B, n_blocks * hidden_size)
-        gen_past_z = self.decoder.linear(gen_z)    # (B, n_blocks * hidden_size)
+        # past_z = self.decoder.linear(latent_z)    # (B, n_blocks * hidden_size)
+        past_z = latent_z
+        # gen_past_z = self.decoder.linear(gen_z)    # (B, n_blocks * hidden_size)
+        gen_past_z = gen_z    # (B, n_blocks * hidden_size)
 
         # past = torch.cat([past_z.unsqueeze(1), past_label.unsqueeze(1)], dim=1) # (B, 2, n_blocks * hidden_size)
 
-        past = past_z + past_label # (B, n_blocks * hidden_size)
+        past = latent_z + label_emb # (B, n_blocks * hidden_size)
 
         outputs = self.decoder(input_ids=tgt_seq_ids, past=past, labels=tgt_seq_ids, label_ignore=self.pad_token_id)
         loss_rec = outputs[0]
 
-        # Train a classifier in the observation space
+        ####################  Train a classifier in the observation space #################### 
         tgt_emb = self.gpt_embeddings(tgt_seq_ids)
         tgt_encode = self.conv1(tgt_emb.transpose(1, 2))    # (B, dim_h, seq_len)
         tgt_encode = torch.mean(tgt_encode, dim=-1) # (B, dim_h)
@@ -144,7 +149,8 @@ class CARA(nn.Module):
         # acc_at_soft_cls = (pred_at_soft_cls == sampled_cond_labels).float()
 
         # Loss
-        loss = loss_rec + loss_encoder + loss_lsc + loss_lsd + loss_lsg + self.args.beta_cls * loss_cls # + loss_at_soft_cls
+        loss_latent_space = (loss_encoder + loss_lsc) + (loss_lsd + loss_lsg) + self.args.beta_cls * loss_cls # + loss_at_soft_cls
+        loss = loss_rec + 0.0 * loss_latent_space
 
         if not self.training:
             # Generate based on encoded z and gt labels

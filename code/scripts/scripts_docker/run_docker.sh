@@ -1,4 +1,4 @@
-SCRIPTPATH="/home/chunyl/research/project/optimus"
+SCRIPTPATH="/home/chunyl/azure_mounts/optimus_azure"
 IMAGE=chunyl/pytorch-transformers:v2
 
 docker run \

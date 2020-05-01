@@ -204,7 +204,7 @@ def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenize
     set_seed(args)  # Added here for reproducibility (even between python 2 and 3)
     for epoch in num_train_epochs_iterator:
         
-        for idx_file in range(num_files-1):
+        for idx_file in range(num_files):
 
             examples = []
             cached_features_file = os.path.join(args.output_file_path, args.dataset.lower()+f'.segmented.nltk.split.seq64.{train_dataloader.file_idx}.json' )

@@ -1,0 +1,66 @@
+version: 4.1.8
+dry_run: false
+exp_name: eval_mlm_wiki2
+description: Evaluate VAE LM on Wiki2 Dataset
+timestamp: '2019-09-26T00:16:52.178691-07:00'
+auth:
+  cluster: et1
+  vc: msrlabs
+  docker:
+    registry: index.docker.io
+    image: chunyl/pytorch-transformers:v0
+code:
+  local_dir: /home/chunyl/azure_mounts/textae_azure/code/scripts/scripts_philly/code
+  remote_dir: code/
+  code_zip: false
+  storage_id: _default
+data:
+  storage_id: _default
+search:
+  type: grid
+  max_trials: 20
+  params:
+  - name: bs_option
+    spec: discrete
+    values:
+    - 1
+  job_template:
+    name: vq_{experiment_name:s}_{bs_option:.0f}
+    sku: G4
+    sku_count: 1
+    command:
+    - pip install --user --editable .
+    - python examples/big_ae/run_lm_vae_pretraining.py --output_dir ../output/local_lm_vae_wiki2_bert_gpt
+      --model_type bert --model_name_or_path bert-base-uncased --train_data_file ../data/datasets/wikitext-2/train.txt
+      --do_eval --eval_data_file ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir
+      --per_gpu_train_batch_size {bs_option}
+    submit_args: {}
+    tags: []
+    type: bash
+jobs:
+- name: vq_eval_mlm_wiki2_1_abcd
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - python examples/big_ae/run_lm_vae_pretraining.py --output_dir ../output/local_lm_vae_wiki2_bert_gpt
+    --model_type bert --model_name_or_path bert-base-uncased --train_data_file ../data/datasets/wikitext-2/train.txt
+    --do_eval --eval_data_file ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir
+    --per_gpu_train_batch_size 1
+  id: application_1568929298048_1911
+  results_dir: /mnt/_output/pt-results/2019-09-26/application_1568929298048_1911
+  submit_args: {}
+  tags: []
+  type: bash
+storage:
+  info:
+    _default:
+      container_name: bigtextae
+      storage_account_name: textae
+      mount_path: /mnt/_default
+      use_phillyfs: false
+    _output:
+      container_name: bigtextae
+      storage_account_name: textae
+      mount_path: /mnt/_output
+      use_phillyfs: false

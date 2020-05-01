@@ -51,7 +51,7 @@ from pytorch_transformers import (WEIGHTS_NAME, AdamW, WarmupLinearSchedule,
                                   OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
                                   RobertaConfig, RobertaForMaskedLM, RobertaTokenizer)
 
-from utils import (calc_iwnll, calc_mi, calc_au, BucketingDataLoader, TextDataset_Split, TextDataset_2Tokenizers, frange_cycle_linear, frange_cycle_zero_linear)
+from utils import (calc_iwnll, calc_rec, calc_mi, calc_au, BucketingDataLoader, TextDataset_Split, TextDataset_2Tokenizers, frange_cycle_linear, frange_cycle_zero_linear)
 
 
 from modules import VAE
@@ -91,7 +91,7 @@ def build_dataload_and_cache_examples(args, tokenizer, evaluate=False):
         else:
             args.batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)  
             file_path=args.eval_data_file
-        dataloader = BucketingDataLoader(file_path, args.batch_size, args.max_seq_length, tokenizer, args, bucket=100, shuffle=True)
+        dataloader = BucketingDataLoader(file_path, args.batch_size, args.max_seq_length, tokenizer, args, bucket=100, shuffle=False)
     else:
         pass 
     return dataloader
@@ -127,6 +127,130 @@ def mask_tokens(inputs, tokenizer, args):
 
     # The rest of the time (10% of the time) we keep the masked input tokens unchanged
     return inputs, labels
+
+
+
+def save_checkpoint(model_vae, optimizer, global_step, args):
+
+    # Create output directory if needed
+    # Save model checkpoint
+    output_encoder_dir = os.path.join(args.output_dir, 'checkpoint-encoder-{}'.format(global_step))
+    output_decoder_dir = os.path.join(args.output_dir, 'checkpoint-decoder-{}'.format(global_step))
+    if not os.path.exists(output_encoder_dir) and args.local_rank in [-1, 0]:
+        os.makedirs(output_encoder_dir)
+    if not os.path.exists(output_decoder_dir) and args.local_rank in [-1, 0]:
+        os.makedirs(output_decoder_dir)
+
+    logger.info("Saving encoder model checkpoint to %s", output_encoder_dir)
+    logger.info("Saving decoder model checkpoint to %s", output_decoder_dir)
+    # Save a trained model, configuration and tokenizer using `save_pretrained()`.
+    # They can then be reloaded using `from_pretrained()`
+
+    model_encoder_to_save = model_vae.module.encoder if hasattr(model_vae, 'module') else model_vae.encoder  # Take care of distributed/parallel training
+    model_decoder_to_save = model_vae.module.decoder if hasattr(model_vae, 'module') else model_vae.decoder  # Take care of distributed/parallel training
+
+    # Good practice: save your training arguments together with the trained model
+    if args.use_philly:
+        save_solid = False
+        while not save_solid:
+            try:
+                model_encoder_to_save.save_pretrained(output_encoder_dir)
+                torch.save(args, os.path.join(output_encoder_dir, 'training_encoder_args.bin'))
+                save_solid = True
+            except:
+                pass
+    else:
+        model_encoder_to_save.save_pretrained(output_encoder_dir)
+        torch.save(args, os.path.join(output_encoder_dir, 'training_encoder_args.bin'))
+
+
+    if args.use_philly:
+        save_solid = False
+        while not save_solid:
+            try:
+                model_decoder_to_save.save_pretrained(output_decoder_dir)
+                torch.save(args, os.path.join(output_decoder_dir, 'training_decoder_args.bin'))
+                save_solid = True
+            except:
+                pass
+    else:
+        model_decoder_to_save.save_pretrained(output_decoder_dir)
+        torch.save(args, os.path.join(output_decoder_dir, 'training_encoder_args.bin'))
+
+
+    # save the full model and optmizer into a checkpoint
+    model_to_save = model_vae.module if hasattr(model_vae, 'module') else model_vae  # Take care of distributed/parallel training
+
+    checkpoint = {
+    'iter': global_step,
+    'model_state_dict': model_to_save.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'beta': model_to_save.args.beta,
+    'args': args
+    }
+
+    output_full_dir = os.path.join(args.output_dir, 'checkpoint-full-{}'.format(global_step))
+    if not os.path.exists(output_full_dir) and args.local_rank in [-1, 0]:
+        os.makedirs(output_full_dir)
+
+    logger.info("Start saving full model checkpoint to %s", output_full_dir)
+    if args.use_philly:
+        save_solid = False
+        n_save_attempts = 0
+        while not save_solid:
+            try:
+                n_save_attempts += 1
+                logger.info(f"Saving full checkpoint: {n_save_attempts} attempts made")
+                torch.save(checkpoint, os.path.join(output_full_dir, 'training.bin'))
+                logger.info("Saving full checkpoint to %s,", output_full_dir)
+                save_solid = True
+            except:
+                pass
+    else:
+        torch.save(checkpoint, os.path.join(output_full_dir, 'training.bin'))
+        logger.info("Saving full checkpoint to %s", output_full_dir)
+
+
+
+def load_checkpoint(args, loading_step=None):
+
+    args.encoder_model_type = args.encoder_model_type.lower()
+    args.decoder_model_type = args.decoder_model_type.lower()
+    if loading_step:
+        global_step = args.gloabl_step_eval
+    else:
+        global_step = args.gloabl_step_eval
+
+    output_encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}'.format(global_step))
+    output_decoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-decoder-{}'.format(global_step)) 
+    output_full_dir    = os.path.join(args.checkpoint_dir, 'checkpoint-full-{}'.format(global_step)) 
+
+    checkpoints = [ [output_encoder_dir, output_decoder_dir] ]
+    logger.info("Evaluate the following checkpoints: %s", checkpoints)
+
+    # Load a trained Encoder model and vocabulary
+    encoder_config_class, encoder_model_class, encoder_tokenizer_class = MODEL_CLASSES[args.encoder_model_type]
+    model_encoder = encoder_model_class.from_pretrained(output_encoder_dir, latent_size=args.latent_size)
+    tokenizer_encoder = encoder_tokenizer_class.from_pretrained(args.encoder_tokenizer_name if args.encoder_tokenizer_name else args.encoder_model_name_or_path, do_lower_case=args.do_lower_case)
+
+    model_encoder.to(args.device)
+    if args.block_size <= 0:
+        args.block_size = tokenizer_encoder.max_len_single_sentence  # Our input block size will be the max possible for the model
+    args.block_size = min(args.block_size, tokenizer_encoder.max_len_single_sentence)
+
+    # Load a trained Decoder model and vocabulary
+    decoder_config_class, decoder_model_class, decoder_tokenizer_class = MODEL_CLASSES[args.decoder_model_type]
+    model_decoder = decoder_model_class.from_pretrained(output_decoder_dir, latent_size=args.latent_size)
+    tokenizer_decoder = decoder_tokenizer_class.from_pretrained(args.decoder_tokenizer_name if args.decoder_tokenizer_name else args.decoder_model_name_or_path, do_lower_case=args.do_lower_case)
+    model_decoder.to(args.device)
+    if args.block_size <= 0:
+        args.block_size = tokenizer_decoder.max_len_single_sentence  # Our input block size will be the max possible for the model
+    args.block_size = min(args.block_size, tokenizer_decoder.max_len_single_sentence)
+
+    # Load full model
+    checkpoint = torch.load(os.path.join(output_full_dir, 'training.bin'))
+
+
 
 
 def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenizer, table_name):
@@ -210,9 +334,9 @@ def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenize
             # tokenized_text1 = tokenized_text1.to(args.device)
             # prepare input-output data for reconstruction
 
-            if (tokenized_text0>len(encoder_tokenizer)).sum().item()>0.0 or (tokenized_text1>len(decoder_tokenizer)).sum().item()>0.0: 
-                pdb.set_trace()
-                continue
+            # if (tokenized_text0>len(encoder_tokenizer)).sum().item()>0.0 or (tokenized_text1>len(decoder_tokenizer)).sum().item()>0.0: 
+            #     pdb.set_trace()
+            #     continue
 
             inputs, labels = mask_tokens(tokenized_text0, encoder_tokenizer, args) if args.mlm else (tokenized_text0, tokenized_text1)
             labels = tokenized_text1
@@ -308,51 +432,7 @@ def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenize
                     logging_loss = tr_loss
 
                 if args.local_rank in [-1, 0] and args.save_steps > 0 and global_step % args.save_steps == 0:
-                    
-                    # Save encoder model checkpoint
-                    output_encoder_dir = os.path.join(args.output_dir, 'checkpoint-encoder-{}'.format(global_step))
-
-                    if not os.path.exists(output_encoder_dir):
-                        os.makedirs(output_encoder_dir)
-
-                    model_encoder_to_save = model_vae.module.encoder if hasattr(model_vae, 'module') else model_vae.encoder  # Take care of distributed/parallel training
-                    if args.use_philly:
-                        save_solid = False
-                        while not save_solid:
-                            try:
-                                model_encoder_to_save.save_pretrained(output_encoder_dir)
-                                torch.save(args, os.path.join(output_encoder_dir, 'training_args.bin'))
-                                logger.info("Saving model checkpoint to %s", output_encoder_dir)
-                                save_solid = True
-                            except:
-                                pass
-                    else:
-                        model_encoder_to_save.save_pretrained(output_encoder_dir)
-                        torch.save(args, os.path.join(output_encoder_dir, 'training_args.bin'))
-                        logger.info("Saving model checkpoint to %s", output_encoder_dir)
-
-                    # Save decoder model checkpoint
-                    output_decoder_dir = os.path.join(args.output_dir, 'checkpoint-decoder-{}'.format(global_step))
-
-                    if not os.path.exists(output_decoder_dir):
-                        os.makedirs(output_decoder_dir)
-
-                    model_decoder_to_save = model_vae.module.decoder if hasattr(model_vae, 'module') else model_vae.decoder  # Take care of distributed/parallel training
-                    if args.use_philly:
-                        save_solid = False
-                        while not save_solid:
-                            try:
-                                model_decoder_to_save.save_pretrained(output_decoder_dir)
-                                torch.save(args, os.path.join(output_decoder_dir, 'training_args.bin'))
-                                logger.info("Saving model checkpoint to %s", output_decoder_dir)
-                                save_solid = True
-                            except:
-                                pass
-                    else:
-                        model_decoder_to_save.save_pretrained(output_decoder_dir)
-                        torch.save(args, os.path.join(output_decoder_dir, 'training_args.bin'))
-                        logger.info("Saving model checkpoint to %s", output_decoder_dir)
-
+                    save_checkpoint(model_vae, optimizer, global_step, args)
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
@@ -366,7 +446,7 @@ def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenize
     if args.local_rank in [-1, 0]:
         tb_writer.close()
 
-    return global_step, tr_loss / global_step
+    return global_step, tr_loss / global_step, optimizer
 
 
 def evaluate(args, model_vae, encoder_tokenizer, decoder_tokenizer, table_name, prefix="", subset="test"):
@@ -410,11 +490,10 @@ def evaluate(args, model_vae, encoder_tokenizer, decoder_tokenizer, table_name, 
 
     output_eval_file = os.path.join(eval_output_dir, "eval_results.txt")
     with open(output_eval_file, "w") as writer:
-        logger.info("***** Eval results {} *****".format(prefix))
+        logger.info("***** Eval results *****")
         for key in sorted(result.keys()):
             logger.info("  %s = %s", key, str(result[key]))
             writer.write("%s = %s\n" % (key, str(result[key])))
-
 
     row = {
             'PartitionKey': 'MILU_Rule_Rule_Template',
@@ -432,6 +511,51 @@ def evaluate(args, model_vae, encoder_tokenizer, decoder_tokenizer, table_name, 
 
     return result
 
+
+
+
+def evaluate_rec(args, model_vae, encoder_tokenizer, decoder_tokenizer, table_name, prefix="", subset="test"):
+    # Loop to handle MNLI double evaluation (matched, mis-matched)
+    eval_output_dir = args.output_dir
+
+    if not os.path.exists(eval_output_dir) and args.local_rank in [-1, 0]:
+        os.makedirs(eval_output_dir)
+
+    args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
+
+    if subset == 'test':
+        eval_dataloader = build_dataload_and_cache_examples(args, [encoder_tokenizer, decoder_tokenizer], evaluate=True)
+    elif subset == 'train':
+        eval_dataloader = build_dataload_and_cache_examples(args, [encoder_tokenizer, decoder_tokenizer], evaluate=False)
+    logger.info("***** Running evaluation on {} dataset *****".format(subset))
+
+    # Note that DistributedSampler samples randomly
+    # eval_sampler = SequentialSampler(eval_dataset) if args.local_rank == -1 else DistributedSampler(eval_dataset)
+    # eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+
+    # eval_dataloader = build_dataload_and_cache_examples(args, [encoder_tokenizer, decoder_tokenizer], evaluate=True)
+
+    # Eval!
+    logger.info("***** Running evaluation {} *****".format(prefix))
+    logger.info("  Num examples = %d", len(eval_dataloader))
+    logger.info("  Batch size = %d", args.eval_batch_size)
+    
+    model_vae.eval()
+    model_vae =  model_vae.module if hasattr(model_vae, 'module') else model_vae  # Take care of distributed/parallel training
+    nll_s, nll_w = calc_rec(model_vae, eval_dataloader, args, ns=1)
+
+    result = {
+        "rec_w": nll_w, "rec_s": nll_s
+    }
+
+    output_eval_file = os.path.join(eval_output_dir, "eval_results.txt")
+    with open(output_eval_file, "w") as writer:
+        logger.info("***** Eval results {} *****".format(prefix))
+        for key in sorted(result.keys()):
+            logger.info("%s = %s", key, str(result[key]))
+            writer.write("%s = %s\n" % (key, str(result[key])))
+
+    return result
 
 def main():
     parser = argparse.ArgumentParser()
@@ -480,7 +604,9 @@ def main():
                         help="Use deterministic inference to generate latent codes, i.e., standard auto-encoders.")
     parser.add_argument("--use_pretrained_model", action='store_true',
                         help="Use pre-trained auto-encoder models as the initialization")
-
+    parser.add_argument("--latent_as_gpt_memory", default=1, type=int, help="Latent vector as memery for GPT2 to attend.")
+    parser.add_argument("--latent_as_gpt_emb", default=1, type=int, help="Latent vector as embeddings for GPT2.")
+    
     ## Objective functions
     parser.add_argument("--mlm", action='store_true',
                         help="Train with masked-language modeling loss instead of language modeling.")
@@ -502,6 +628,8 @@ def main():
                         help="Whether to run training.")
     parser.add_argument("--do_eval", action='store_true',
                         help="Whether to run eval on the dev set.")
+    parser.add_argument("--do_eval_rec", action='store_true',
+                        help="Whether to run eval reconstruction on a set of models.")   
     parser.add_argument("--evaluate_during_training", action='store_true',
                         help="Run evaluation during training at each logging step.")
     parser.add_argument("--do_lower_case", action='store_true',
@@ -620,23 +748,19 @@ def main():
     # Set seed
     set_seed(args)
 
-    # Load pretrained model and tokenizer
     if args.local_rank not in [-1, 0]:
         torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training download model & vocab
 
+    # Load Optimius pre-trained model and tokenizer
     if args.use_pretrained_model:
-
         args.encoder_model_type = args.encoder_model_type.lower()
         args.decoder_model_type = args.decoder_model_type.lower()
 
         global_step = args.gloabl_step_eval
 
-        if args.use_pretrained_vae:
-            output_encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}-1.0'.format(global_step))
-            output_decoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-decoder-{}-1.0'.format(global_step)) 
-        else:
-            output_encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}'.format(global_step))
-            output_decoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-decoder-{}'.format(global_step)) 
+        output_encoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-encoder-{}'.format(global_step))
+        output_decoder_dir = os.path.join(args.checkpoint_dir, 'checkpoint-decoder-{}'.format(global_step)) 
+        output_full_dir    = os.path.join(args.checkpoint_dir, 'checkpoint-full-{}'.format(global_step)) 
 
         checkpoints = [ [output_encoder_dir, output_decoder_dir] ]
         logger.info("Evaluate the following checkpoints: %s", checkpoints)
@@ -660,7 +784,13 @@ def main():
             args.block_size = tokenizer_decoder.max_len_single_sentence  # Our input block size will be the max possible for the model
         args.block_size = min(args.block_size, tokenizer_decoder.max_len_single_sentence)
 
+        # Load full model
+        checkpoint = torch.load(os.path.join(output_full_dir, 'training.bin'))
+
+        
     else:
+        # Load BERT and GPT weights (As an alternaive, one may train a VAE for this small)
+
         ## Encoder 
         encoder_config_class, encoder_model_class, encoder_tokenizer_class = MODEL_CLASSES[args.encoder_model_type]
         encoder_config = encoder_config_class.from_pretrained(args.encoder_config_name if args.encoder_config_name else args.encoder_model_name_or_path)
@@ -678,9 +808,18 @@ def main():
         if args.block_size <= 0:
             args.block_size = tokenizer_decoder.max_len_single_sentence  # Our input block size will be the max possible for the model
         args.block_size = min(args.block_size, tokenizer_decoder.max_len_single_sentence)
-        model_decoder = decoder_model_class.from_pretrained(args.decoder_model_name_or_path, from_tf=bool('.ckpt' in args.decoder_model_name_or_path), config=decoder_config, latent_size=args.latent_size)
-        
 
+        
+        if args.latent_as_gpt_emb + args.latent_as_gpt_memory == 0:
+            return # latent vector should pass into GPT to decode 
+        else: 
+            latent_as_gpt_emb = True if args.latent_as_gpt_emb == 1 else False
+            latent_as_gpt_memory = True if args.latent_as_gpt_memory == 1 else False
+
+        setattr(decoder_config, "latent_size", args.latent_size)
+        model_decoder = decoder_model_class.from_pretrained(args.decoder_model_name_or_path, from_tf=bool('.ckpt' in args.decoder_model_name_or_path), config=decoder_config, latent_size=args.latent_size, latent_as_gpt_emb=latent_as_gpt_emb, latent_as_gpt_memory=latent_as_gpt_memory)
+        
+    # Save the init weights of BERT and GPT-2, so that we can load from local (Some infra requires so)
     if args.save_bert_gpt_init:
         encoder_path = os.path.join(args.output_dir, f"initial-models-tokenization-enoder-{args.latent_size}")
         if not os.path.exists(encoder_path): os.makedirs(encoder_path)
@@ -705,7 +844,11 @@ def main():
 
     # model_decoder.to(args.device)
 
-    model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args).to(args.device) # 
+    model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args)
+    if args.use_pretrained_model:
+        model_vae.load_state_dict(checkpoint['model_state_dict'])
+        logger.info("Pre-trained Optimus is successfully loaded")
+    model_vae.to(args.device) # 
 
     # on_gpu = next(model_vae.parameters()).is_cuda
 
@@ -715,9 +858,10 @@ def main():
         torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
 
     logger.info("Training/evaluation parameters %s", args)
-
-    global_step= 0
+    
+    ##############################
     # Training
+    global_step= 0
     if args.do_train:
         if args.local_rank not in [-1, 0]:
             torch.distributed.barrier()  # Barrier to make sure only the first process in distributed training process the dataset, and the others will use the cache
@@ -727,68 +871,16 @@ def main():
         if args.local_rank == 0:
             torch.distributed.barrier()
 
-        global_step, tr_loss = train(args, train_dataloader, model_vae, tokenizer_encoder, tokenizer_decoder, table_name)
+        global_step, tr_loss, optimizer = train(args, train_dataloader, model_vae, tokenizer_encoder, tokenizer_decoder, table_name)
         logger.info(" global_step = %s, average loss = %s", global_step, tr_loss)
-
 
     # Saving best-practices: if you use save_pretrained for the model and tokenizer, you can reload them using from_pretrained()
     if args.do_train and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
-        # Create output directory if needed
-        # Save model checkpoint
-        output_encoder_dir = os.path.join(args.output_dir, 'checkpoint-encoder-{}'.format(global_step))
-        output_decoder_dir = os.path.join(args.output_dir, 'checkpoint-decoder-{}'.format(global_step))
-        if not os.path.exists(output_encoder_dir) and args.local_rank in [-1, 0]:
-            os.makedirs(output_encoder_dir)
-        if not os.path.exists(output_decoder_dir) and args.local_rank in [-1, 0]:
-            os.makedirs(output_decoder_dir)
+        save_checkpoint(model_vae, optimizer, global_step, args)
 
-        logger.info("Saving encoder model checkpoint to %s", output_encoder_dir)
-        logger.info("Saving decoder model checkpoint to %s", output_decoder_dir)
-        # Save a trained model, configuration and tokenizer using `save_pretrained()`.
-        # They can then be reloaded using `from_pretrained()`
-
-        model_encoder_to_save = model_vae.module.encoder if hasattr(model_vae, 'module') else model_vae.encoder  # Take care of distributed/parallel training
-        model_decoder_to_save = model_vae.module.decoder if hasattr(model_vae, 'module') else model_vae.decoder  # Take care of distributed/parallel training
-
-        # Good practice: save your training arguments together with the trained model
-        if args.use_philly:
-            save_solid = False
-            while not save_solid:
-                try:
-                    model_encoder_to_save.save_pretrained(output_encoder_dir)
-                    torch.save(args, os.path.join(output_encoder_dir, 'training_encoder_args.bin'))
-                    save_solid = True
-                except:
-                    pass
-        else:
-            model_encoder_to_save.save_pretrained(output_encoder_dir)
-            torch.save(args, os.path.join(output_encoder_dir, 'training_encoder_args.bin'))
-
-
-        if args.use_philly:
-            save_solid = False
-            while not save_solid:
-                try:
-                    model_decoder_to_save.save_pretrained(output_decoder_dir)
-                    torch.save(args, os.path.join(output_decoder_dir, 'training_decoder_args.bin'))
-                    save_solid = True
-                except:
-                    pass
-        else:
-            model_decoder_to_save.save_pretrained(output_decoder_dir)
-            torch.save(args, os.path.join(output_decoder_dir, 'training_encoder_args.bin'))
-
-
-        # Load a trained model and vocabulary that you have fine-tuned
-        model_encoder = encoder_model_class.from_pretrained(output_encoder_dir, latent_size=args.latent_size)
-        model_encoder.to(args.device)
-
-        # Load a trained model and vocabulary that you have fine-tuned
-        model_decoder = decoder_model_class.from_pretrained(output_decoder_dir, latent_size=args.latent_size)
-        model_decoder.to(args.device)
         
-
-    # Evaluation
+    ##############################
+    # Evaluation the metrics of VAE models, including PPL, MI, AU
     results = {}
     if args.do_eval and args.local_rank in [-1, 0]:
         if global_step == 0:
@@ -796,26 +888,78 @@ def main():
 
         output_encoder_dir = os.path.join(args.output_dir, 'checkpoint-encoder-{}'.format(global_step))
         output_decoder_dir = os.path.join(args.output_dir, 'checkpoint-decoder-{}'.format(global_step))
-        checkpoints = [ [output_encoder_dir, output_decoder_dir] ]
+        output_full_dir    = os.path.join(args.output_dir, 'checkpoint-full-{}'.format(global_step))
+        checkpoint_dir = [output_encoder_dir, output_decoder_dir, output_full_dir]
+
+        logger.info("Evaluate the following checkpoint: %s", checkpoint_dir[-1])
+        global_step = checkpoint_dir[-1].split('-')[-1] if len(checkpoint_dir) > 1 else ""
+
+        checkpoint = torch.load(os.path.join(output_full_dir, 'training.bin'))
+        model_vae.load_state_dict(checkpoint['model_state_dict'])
+        logger.info(f"Pre-trained Optimus is successfully loaded: {output_full_dir}")
+        model_vae.to(args.device)
+
+        result = evaluate(args, model_vae, tokenizer_encoder, tokenizer_decoder, table_name, prefix=global_step, subset='test')
+        result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
+        results.update(result)
+
+        output_eval_file = os.path.join(args.output_dir, "eval_vae_results.txt")
+        with open(output_eval_file, "w") as writer:
+            logger.info("***** Eval results *****")
+            for key in sorted(results.keys()):
+                logger.info("%s = %s", key, str(results[key]))
+                writer.write("%s = %s\n" % (key, str(results[key])))
+        logger.info(f"The testing results are successfully saved: {output_eval_file}")
+
+    ##############################
+    #  Evaluate the reconstruction loss for each checkpoints; 
+    # This is used in studying two different latent vector injection schemes
+    results = {}
+    if args.do_eval_rec and args.local_rank in [-1, 0]:
+        if global_step == 0:
+            global_step = args.gloabl_step_eval
+            # eval_steps = range(500, 13500, 500)
+            # eval_steps = range(1000, 2000, 500)
+            eval_steps = range(2000, 32000, 2000)
+
+        checkpoints = []
+        for e in eval_steps:
+            output_encoder_dir = os.path.join(args.output_dir, 'checkpoint-encoder-{}'.format(e))
+            output_decoder_dir = os.path.join(args.output_dir, 'checkpoint-decoder-{}'.format(e))
+            checkpoints.append([output_encoder_dir, output_decoder_dir])
+
+        
 
         logger.info("Evaluate the following checkpoints: %s", checkpoints)
         for checkpoint in checkpoints:
             global_step = checkpoint[0].split('-')[-1] if len(checkpoints) > 1 else ""
 
             model_encoder = encoder_model_class.from_pretrained(checkpoint[0], latent_size=args.latent_size)
-            model_encoder.to(args.device)            
-            model_decoder = decoder_model_class.from_pretrained(checkpoint[1], latent_size=args.latent_size)
+            model_encoder.to(args.device)     
+     
+            model_decoder = decoder_model_class.from_pretrained(checkpoint[1])
             model_decoder.to(args.device)
 
             model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args).to(args.device)
 
-            result = evaluate(args, model_vae, tokenizer_encoder, tokenizer_decoder, table_name, prefix=global_step, subset='test')
-            result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
+            result = evaluate_rec(args, model_vae, tokenizer_encoder, tokenizer_decoder, table_name, prefix=global_step, subset='test')
+            result = dict((k + '_test_{}'.format(global_step), v) for k, v in result.items())
             results.update(result)
 
-            # result = evaluate(args, model_vae, tokenizer_encoder, tokenizer_decoder, table_name, prefix=global_step, subset='train')
-            # result = dict((k + '_{}'.format(global_step), v) for k, v in result.items())
-            # results.update(result)
+            result = evaluate_rec(args, model_vae, tokenizer_encoder, tokenizer_decoder, table_name, prefix=global_step, subset='train')
+            result = dict((k + '_train_{}'.format(global_step), v) for k, v in result.items())
+            results.update(result)
+            
+            # pdb.set_trace()
+
+        output_eval_file = os.path.join(args.output_dir, "eval_rec_results.txt")
+        with open(output_eval_file, "w") as writer:
+            logger.info("***** Eval results *****")
+            for key in sorted(results.keys()):
+                logger.info("%s = %s", key, str(results[key]))
+                writer.write("%s = %s\n" % (key, str(results[key])))
+        logger.info(f"The testing results are successfully saved: {output_eval_file}")
+
 
     return results
 

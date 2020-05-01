@@ -232,10 +232,10 @@ class MultipleFiles_DataLoader(object):
         self.file_idx = 0
 
 
-
+# When the dataset is too big, we can divide it into multiple small files.
+# This class is used load multiple files.
 class BucketingMultipleFiles_DataLoader(object):
     def __init__(self, file_path, batch_size, max_seq_length, tokenizer, args, bucket=100, shuffle=True):
-
 
         self.batch_size = batch_size
         self.max_len = max_seq_length
@@ -256,7 +256,7 @@ class BucketingMultipleFiles_DataLoader(object):
 
     def __iter__(self):
         
-        #sampler = BucketSampler(self.example_lengths, self.bucket_size, self.batch_size, droplast=True, shuffle=self.shuffle)
+        # sampler = BucketSampler(self.example_lengths, self.bucket_size, self.batch_size, droplast=True, shuffle=self.shuffle)
         # loader = DataLoader(self.dataset, batch_sampler=sampler, num_workers=0, collate_fn=PreparedTokenDataset.collate)
 
         # distributed
@@ -1098,6 +1098,51 @@ def calc_iwnll(model_vae, eval_dataloader, args, ns=20):
     ppl  = np.exp(-report_loss / report_num_words)
 
     return ppl, elbo, nll, kl
+
+
+
+def calc_rec(model_vae, eval_dataloader, args, ns=1):
+
+    eval_loss = 0.0
+    ############ Perplexity ############
+    report_kl_loss = report_rec_loss = report_loss = 0
+    report_num_words = report_num_sents = 0
+
+    i = 0
+    for batch in tqdm(eval_dataloader, desc="Evaluating PPL"):
+        # pdb.set_trace()
+        x0, x1, x_lengths = batch
+
+        max_len_values, _ = x_lengths.max(0)
+        x0 = x0[:,:max_len_values[0]]
+        x1 = x1[:,:max_len_values[1]]
+
+        x0 = x0.to(args.device)
+        x1 = x1.to(args.device)
+        x_lengths = x_lengths.to(args.device)
+
+        # pdb.set_trace()
+        # not predict start symbol
+        report_num_words += x_lengths[:,1].sum().item()
+        report_num_sents += args.eval_batch_size
+
+        with torch.no_grad():
+            loss, loss_rc, loss_kl = model_vae.loss_iw(x0, x1, nsamples=1, ns=1)
+
+        loss_rc = loss_rc.sum()
+        report_rec_loss += loss_rc.item()
+
+        i += 1
+        if i > 500:
+            break
+
+
+        # pdb.set_trace()
+
+    nll_s  = - report_rec_loss / report_num_sents
+    nll_w  = - report_rec_loss / report_num_words
+
+    return nll_s, nll_w
 
 
 

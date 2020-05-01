@@ -1,0 +1,186 @@
+version: 4.1.8
+dry_run: false
+exp_name: train_vae_penn_ft
+description: Train VAE on PTB Dataset
+timestamp: '2020-04-03T21:35:54.650274+00:00'
+auth:
+  cluster: eu2
+  vc: msrlabs
+  docker:
+    registry: index.docker.io
+    image: chunyl/pytorch-transformers:v0
+code:
+  local_dir: /data/home/chunyl/azure_mounts/optimus_azure/code/scripts/scripts_philly/code
+  remote_dir: code/
+  code_zip: false
+  storage_id: _default
+data:
+  storage_id: _default
+search:
+  type: grid
+  max_trials: 50
+  params:
+  - name: bs_option
+    spec: discrete
+    values:
+    - 4
+  - name: beta_option
+    spec: discrete
+    values:
+    - 0.0
+  - name: dim_target_kl_option
+    spec: discrete
+    values:
+    - 0.05
+    - 0.1
+    - 0.25
+    - 0.5
+    - 1
+  - name: ratio_zero_option
+    spec: discrete
+    values:
+    - 0.5
+  - name: ratio_increase_option
+    spec: discrete
+    values:
+    - 0.25
+  job_template:
+    name: exp_{experiment_name:s}_b{bs_option:.0f}_beta_{beta_option:.2f}_d_{dim_target_kl_option:.2f}_r0_{ratio_zero_option:.2f}_ra_{ratio_increase_option:.2f}
+    sku: G4
+    sku_count: 1
+    command:
+    - pip install --user --editable .
+    - pip install --user azure
+    - pip install --user tqdm
+    - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+      1.0 --beta {beta_option} --dim_target_kl {dim_target_kl_option} --ratio_zero
+      {ratio_zero_option} --ratio_increase {ratio_increase_option} --dataset Penn
+      --per_gpu_train_batch_size {bs_option} --per_gpu_eval_batch_size 1 --block_size
+      100 --output_dir ../output/philly_vae_penn_b{beta_option}_d{dim_target_kl_option}_r0{ratio_zero_option}_ra{ratio_increase_option}
+      --encoder_model_type bert --encoder_model_name_or_path bert-base-cased --decoder_model_type
+      gpt2 --decoder_model_name_or_path gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt
+      --do_eval --eval_data_file ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps
+      2000 --logging_steps 100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir
+      ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+      --gloabl_step_eval 200000
+    submit_args: {}
+    tags: []
+    type: bash
+jobs:
+- name: exp_train_vae_penn_ft_b4_beta_0.00_d_0.50_r0_0.50_ra_0.25_abch
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user azure
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+    1.0 --beta 0.0 --dim_target_kl 0.5 --ratio_zero 0.5 --ratio_increase 0.25 --dataset
+    Penn --per_gpu_train_batch_size 4 --per_gpu_eval_batch_size 1 --block_size 100
+    --output_dir ../output/philly_vae_penn_b0.0_d0.5_r00.5_ra0.25 --encoder_model_type
+    bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path
+    gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file
+    ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps
+    100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+    --gloabl_step_eval 200000
+  id: application_1583307153868_10015
+  results_dir: /mnt/_output/pt-results/2020-04-03/application_1583307153868_10015
+  submit_args: {}
+  tags: []
+  type: bash
+- name: exp_train_vae_penn_ft_b4_beta_0.00_d_0.25_r0_0.50_ra_0.25_abce
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user azure
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+    1.0 --beta 0.0 --dim_target_kl 0.25 --ratio_zero 0.5 --ratio_increase 0.25 --dataset
+    Penn --per_gpu_train_batch_size 4 --per_gpu_eval_batch_size 1 --block_size 100
+    --output_dir ../output/philly_vae_penn_b0.0_d0.25_r00.5_ra0.25 --encoder_model_type
+    bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path
+    gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file
+    ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps
+    100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+    --gloabl_step_eval 200000
+  id: application_1583307153868_10014
+  results_dir: /mnt/_output/pt-results/2020-04-03/application_1583307153868_10014
+  submit_args: {}
+  tags: []
+  type: bash
+- name: exp_train_vae_penn_ft_b4_beta_0.00_d_0.10_r0_0.50_ra_0.25_abcg
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user azure
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+    1.0 --beta 0.0 --dim_target_kl 0.1 --ratio_zero 0.5 --ratio_increase 0.25 --dataset
+    Penn --per_gpu_train_batch_size 4 --per_gpu_eval_batch_size 1 --block_size 100
+    --output_dir ../output/philly_vae_penn_b0.0_d0.1_r00.5_ra0.25 --encoder_model_type
+    bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path
+    gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file
+    ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps
+    100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+    --gloabl_step_eval 200000
+  id: application_1583307153868_10017
+  results_dir: /mnt/_output/pt-results/2020-04-03/application_1583307153868_10017
+  submit_args: {}
+  tags: []
+  type: bash
+- name: exp_train_vae_penn_ft_b4_beta_0.00_d_0.05_r0_0.50_ra_0.25_abcd
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user azure
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+    1.0 --beta 0.0 --dim_target_kl 0.05 --ratio_zero 0.5 --ratio_increase 0.25 --dataset
+    Penn --per_gpu_train_batch_size 4 --per_gpu_eval_batch_size 1 --block_size 100
+    --output_dir ../output/philly_vae_penn_b0.0_d0.05_r00.5_ra0.25 --encoder_model_type
+    bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path
+    gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file
+    ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps
+    100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+    --gloabl_step_eval 200000
+  id: application_1583307153868_10018
+  results_dir: /mnt/_output/pt-results/2020-04-03/application_1583307153868_10018
+  submit_args: {}
+  tags: []
+  type: bash
+- name: exp_train_vae_penn_ft_b4_beta_0.00_d_1.00_r0_0.50_ra_0.25_abcf
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user azure
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs
+    1.0 --beta 0.0 --dim_target_kl 1 --ratio_zero 0.5 --ratio_increase 0.25 --dataset
+    Penn --per_gpu_train_batch_size 4 --per_gpu_eval_batch_size 1 --block_size 100
+    --output_dir ../output/philly_vae_penn_b0.0_d1_r00.5_ra0.25 --encoder_model_type
+    bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path
+    gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file
+    ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps
+    100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32
+    --gloabl_step_eval 200000
+  id: application_1583307153868_10016
+  results_dir: /mnt/_output/pt-results/2020-04-03/application_1583307153868_10016
+  submit_args: {}
+  tags: []
+  type: bash
+storage:
+  info:
+    _default:
+      mount_path: /mnt/_default
+      storage_account_name: textae
+      container_name: optimus
+      use_phillyfs: false
+    _output:
+      mount_path: /mnt/_output
+      storage_account_name: textae
+      container_name: optimus
+      use_phillyfs: false

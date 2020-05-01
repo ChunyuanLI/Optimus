@@ -186,9 +186,8 @@ def sample_sequence_conditional(model, length, context, past=None, num_samples=1
 
 
 
-
-def evaluate_recontruction(args, model_vae, encoder_tokenizer, decoder_tokenizer, prefix=""):
-    # Loop to handle MNLI double evaluation (matched, mis-matched)
+# a wrapper function to choose between different play modes
+def evaluate_latent_space(args, model_vae, encoder_tokenizer, decoder_tokenizer, prefix=""):
 
     eval_dataloader = build_dataload_and_cache_examples(args, [encoder_tokenizer, decoder_tokenizer], evaluate=False)
 
@@ -253,7 +252,7 @@ def calc_rec(model_vae, eval_dataloader, encoder_tokenizer, decoder_tokenizer, a
             mean, logvar = model_vae.encoder.linear(pooled_hidden_fea).chunk(2, -1)
             latent_z = mean.squeeze(1)
 
-            past = model_vae.decoder.linear(latent_z)
+            past = latent_z
             out = sample_sequence_conditional(
                 model=model_vae.decoder,
                 context=context_tokens,
@@ -325,7 +324,7 @@ def calc_interpolate(model_vae, eval_dataloader, encoder_tokenizer, decoder_toke
     for step in range(num_steps+1):
         latent_z = latent_codes[0] + (latent_codes[1] - latent_codes[0]) * step * 1.0/num_steps
 
-        past = model_vae.decoder.linear(latent_z)
+        past = latent_z
         out = sample_sequence_conditional(
             model=model_vae.decoder,
             context=context_tokens,
@@ -463,6 +462,10 @@ def main():
         args.block_size = tokenizer_decoder.max_len_single_sentence  # Our input block size will be the max possible for the model
     args.block_size = min(args.block_size, tokenizer_decoder.max_len_single_sentence)
 
+    # Load full model
+    output_full_dir    = os.path.join(args.checkpoint_dir, 'checkpoint-full-{}'.format(global_step)) 
+    checkpoint = torch.load(os.path.join(output_full_dir, 'training.bin'))
+
     # Chunyuan: Add Padding token to GPT2
     special_tokens_dict = {'pad_token': '<PAD>', 'bos_token': '<BOS>', 'eos_token': '<EOS>'}
     num_added_toks = tokenizer_decoder.add_special_tokens(special_tokens_dict)
@@ -472,9 +475,12 @@ def main():
 
     
     # Evaluation
-    model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args).to(args.device)
+    model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args)
+    model_vae.load_state_dict(checkpoint['model_state_dict'])
+    logger.info("Pre-trained Optimus is successfully loaded")
+    model_vae.to(args.device)
 
-    result = evaluate_recontruction(args, model_vae, tokenizer_encoder, tokenizer_decoder, prefix=global_step)
+    result = evaluate_latent_space(args, model_vae, tokenizer_encoder, tokenizer_decoder, prefix=global_step)
 
 
 if __name__ == '__main__':

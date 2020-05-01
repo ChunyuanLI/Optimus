@@ -361,9 +361,13 @@ class GPT2Model(GPT2PreTrainedModel):
         self.h = nn.ModuleList([Block(config.n_ctx, config, scale=True) for _ in range(config.n_layer)])
         self.ln_f = nn.LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)
 
-        latent_size = 32
-        self.linear = nn.Linear(latent_size, config.hidden_size * config.n_layer, bias=False) # different latent vector for each layer 
-        self.linear_emb = nn.Linear(latent_size, config.hidden_size, bias=False) # share the same latent vector as the embeddings
+        try:
+            self.latent_size = config.latent_size
+        except: 
+            self.latent_size = 32 # default size is 32
+
+        self.linear = nn.Linear(self.latent_size, config.hidden_size * config.n_layer, bias=False) # different latent vector for each layer 
+        self.linear_emb = nn.Linear(self.latent_size, config.hidden_size, bias=False) # share the same latent vector as the embeddings
 
         self.config = config
         self.init_weights()
@@ -379,30 +383,37 @@ class GPT2Model(GPT2PreTrainedModel):
         for layer, heads in heads_to_prune.items():
             self.h[layer].attn.prune_heads(heads)
 
-    def forward(self, input_ids, past=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, latent_as_gpt_emb=False):
+    def forward(self, input_ids, past=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, latent_as_gpt_emb=False, latent_as_gpt_memory=True):
+
         if past is None:
             past_length = 0
             past = [None] * len(self.h)
         else:
-        
+            
+
             if latent_as_gpt_emb:
                 past_emb = self.linear_emb(past) # used as embeddings to add on other three embeddings
 
-            past = self.linear(past)
-            share_latent = False
-            if share_latent: 
-                # the same latent vector shared by all layers
-                past = [past.unsqueeze(-2), past.unsqueeze(-2)] # query, key
-                past = [past] * len(self.h)
-                past_length = past[0][0].size(-2)
-            else: 
-                # different latent vectors for each layer
-                past_split = torch.split(past.unsqueeze(1), self.config.hidden_size, dim=2)
-                past = list(zip(past_split,past_split))
-                
-                # past = past.view(batch_size,len(self.h),-1)
-                # past = [[past[:,i,:].unsqueeze(-2), past[:,i,:].unsqueeze(-2) ] for i in range(len(self.h))]
-                past_length = 1 # past[0][0].size(-2)
+            if latent_as_gpt_memory:
+                past = self.linear(past)
+                share_latent = False
+                if share_latent: 
+                    # the same latent vector shared by all layers
+                    past = [past.unsqueeze(-2), past.unsqueeze(-2)] # query, key
+                    past = [past] * len(self.h)
+                    past_length = past[0][0].size(-2)
+                else: 
+                    # different latent vectors for each layer
+                    past_split = torch.split(past.unsqueeze(1), self.config.hidden_size, dim=2)
+                    past = list(zip(past_split,past_split))
+                    
+                    # past = past.view(batch_size,len(self.h),-1)
+                    # past = [[past[:,i,:].unsqueeze(-2), past[:,i,:].unsqueeze(-2) ] for i in range(len(self.h))]
+                    past_length = 1 # past[0][0].size(-2)
+            else:
+                past_length = 0
+                past = [None] * len(self.h)
+
 
         if position_ids is None:
             position_ids = torch.arange(past_length, input_ids.size(-1) + past_length, dtype=torch.long, device=input_ids.device)
@@ -629,13 +640,20 @@ class GPT2ForLatentConnector(GPT2PreTrainedModel):
         loss, logits = outputs[:2]
 
     """
-    def __init__(self, config, latent_size):
+    def __init__(self, config, latent_size=32, latent_as_gpt_emb=True, latent_as_gpt_memory=True):
+        
         super(GPT2ForLatentConnector, self).__init__(config)
+
+        
         self.transformer = GPT2Model(config)
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
 
         self.init_weights()
         self.tie_weights()
+
+        self.latent_as_gpt_emb = latent_as_gpt_emb
+        self.latent_as_gpt_memory = latent_as_gpt_memory
+
 
 
     def tie_weights(self):
@@ -655,7 +673,8 @@ class GPT2ForLatentConnector(GPT2PreTrainedModel):
                                                token_type_ids=token_type_ids,
                                                position_ids=position_ids,
                                                head_mask=head_mask, 
-                                               latent_as_gpt_emb=True)
+                                               latent_as_gpt_emb=self.latent_as_gpt_emb,
+                                               latent_as_gpt_memory=self.latent_as_gpt_memory)
         hidden_states = transformer_outputs[0]
 
         lm_logits = self.lm_head(hidden_states)

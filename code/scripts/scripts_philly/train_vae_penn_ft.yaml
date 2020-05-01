@@ -1,0 +1,61 @@
+description: Train VAE on PTB Dataset
+
+auth:
+  # which virtual cluster you belong to (msrlabs, resrchprojvc6, msrlabspvc11, etc.). Everyone has access to "pnrsy".
+  vc: msrlabs
+  # physical cluster to use (cam, gcr, rr1) or Azure clusters (eu1, eu2, etc.)
+  # cluster: rr2, eu2, eu1 et1 
+  cluster: eu2
+  # docker environment (vm) in which your job will run. we provide "generic" dockers
+  # with the main deep learning toolkit installed (PyTorch, TF, Chainer, etc.)
+  docker:
+    # image: pytorch-transformers:v1
+    # registry: chunylregistry.azurecr.io
+    image: chunyl/pytorch-transformers:v0
+    registry: index.docker.io
+
+storage:
+  _default:
+    #use_phillyfs: True
+    storage_account_name: textae
+    container_name: optimus
+    mount_path: /mnt/_default
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  # $CONFIG_DIR is expanded to the directory of this config file
+  code_upload: False
+  remote_dir: code/
+  local_dir: $CONFIG_DIR/code
+
+#data:
+  # data upload is not required for this example
+  #data_upload: False
+
+search:
+  job_template:
+    name: exp_{experiment_name:s}_b{bs_option:.0f}_beta_{beta_option:.2f}_d_{dim_target_kl_option:.2f}_r0_{ratio_zero_option:.2f}_ra_{ratio_increase_option:.2f}
+    sku: G4 # G4 # G1
+    command:
+    - pip install --user --editable .
+    - pip install --user azure
+    - pip install --user tqdm
+    - python examples/big_ae/run_lm_vae_training.py --use_philly --num_train_epochs 1.0 --beta {beta_option} --dim_target_kl {dim_target_kl_option} --ratio_zero {ratio_zero_option} --ratio_increase {ratio_increase_option} --dataset Penn --per_gpu_train_batch_size {bs_option} --per_gpu_eval_batch_size 1 --block_size 100 --output_dir ../output/philly_vae_penn_b{beta_option}_d{dim_target_kl_option}_r0{ratio_zero_option}_ra{ratio_increase_option} --encoder_model_type bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2 --do_train --train_data_file ../data/datasets/penn/train.txt --do_eval --eval_data_file ../data/datasets/penn/test.txt --overwrite_output_dir  --save_steps 2000 --logging_steps 100  --use_pretrained_model --use_pretrained_vae --checkpoint_dir ../output/pretrain/philly_rr1_vc21_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32 --gloabl_step_eval 200000
+  max_trials: 50
+  type: grid
+  params:
+    - name: bs_option
+      spec: discrete
+      values: [4] # 
+    - name: beta_option
+      spec: discrete
+      values: [0.0] # 
+    - name: dim_target_kl_option
+      spec: discrete
+      values: [0.05,0.1,0.25,0.5,1] # 
+    - name: ratio_zero_option
+      spec: discrete
+      values: [0.5] #
+    - name: ratio_increase_option
+      spec: discrete
+      values: [0.25] # 

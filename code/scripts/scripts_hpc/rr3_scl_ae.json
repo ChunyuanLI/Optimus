@@ -1,0 +1,54 @@
+{
+  "ClusterId": "rr1",
+  "VcId": "resrchprojvc7",
+  "JobName": "textae_wiki_beta_g8_768",
+  "UserName": "xiul",
+  "BuildId": 0,
+  "ToolType": null,
+  "ConfigFile": "/aztextae/code/examples/big_ae/run_lm_vae_pretraining_phdist_beta.py",
+  "Inputs": [
+    {
+      "Name": "dataDir",
+      "Path": "/aztextae/data"
+    }
+  ],
+  "OutputRoot": {
+      "Name": "outputDir",
+      "Path": "/aztextae"
+  },
+  "LogRoot": {
+      "Name": "logDir",
+      "Path": "/aztextae"
+  },
+  "Outputs": [],
+  "IsDebug": false,
+  "RackId": "anyConnected",
+  "MinGPUs": 8,
+  "PrevModelPath": null,
+  "ExtraParams": "--use_philly --num_train_epochs 1.0 --beta 1.0 --dim_target_kl 1.0 --ratio_zero 0.5 --ratio_increase 0.25 --dataset wikipedia --per_gpu_train_batch_size 16 --per_gpu_eval_batch_size 1 --block_size 128 --output_dir /aztextae/output/philly_rr1_g8_vae_wikipedia_pretraining_beta_schedule_beta1.0_d1.0_ro0.5_ra0.25_768 --encoder_model_type bert --encoder_model_name_or_path /aztextae/output/local_lm_vae_bert_gpt_init_768/initial-models-tokenization-enoder-768 --decoder_model_type gpt2 --decoder_model_name_or_path /aztextae/output/local_lm_vae_bert_gpt_init_768/initial-models-tokenization-decoder-768 --do_train --train_data_file /aztextae/data/datasets/wikipedia_json_64_filtered --overwrite_output_dir --save_steps 20000 --logging_steps 100 --use_beta_schedule --latent_size 768",  
+  "IsMemCheck": false,
+  "IsCrossRack": false,
+  "Timeout": null,
+  "Registry": "index.docker.io",
+  "Repository": "vlnres/textae-dist",  
+  "Tag": "v1",
+  "CustomMPIArgs": "env CUDA_CACHE_DISABLE=1 NCCL_IB_HCA=mlx5_0 NCCL_SOCKET_IFNAME=ib0 NCCL_DEBUG=INFO OMP_NUM_THREADS=12",
+  "volumes": {
+    "blob_out": {
+      "_comment": "This will mount testcontainer in the storage account pavermatest inside the container at path '/blob'. The credentials required for accessing storage account pavermatest are below, in the 'credentials' section.",
+      "type": "blobfuseVolume",
+      "storageAccount": "textae",
+      "containerName": "bigtextae",
+      "path": "/aztextae",
+      "options": ["-o", "allow_other"]
+    }
+  },
+  "credentials": {
+    "storageAccounts": {
+      "textae": {
+        "_comment": "Credentials for accessing 'pavermatest' storage account. Secrets can be saved with Philly from your Philly profile page at https://philly/#/userView/. With this the secret doesn't have to be maintained in the user's workspace.",
+        "keyKeyvaultSecretId": "https://phillyusersecrets.vault.azure.net:443/secrets/xiul-textae/e120635ae83147ccad81a90e38fb4e89"
+      }
+    }
+  }
+}

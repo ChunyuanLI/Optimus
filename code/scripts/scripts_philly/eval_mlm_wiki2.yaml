@@ -1,0 +1,47 @@
+description: Evaluate VAE LM on Wiki2 Dataset
+
+auth:
+  # which virtual cluster you belong to (msrlabs, etc.). Everyone has access to "pnrsy".
+  vc: resrchprojvc6
+  # physical cluster to use (cam, gcr, rr1) or Azure clusters (eu1, eu2, etc.)
+  # cluster: rr2, eu2, eu1 et1 
+  cluster: rr1
+  # docker environment (vm) in which your job will run. we provide "generic" dockers
+  # with the main deep learning toolkit installed (PyTorch, TF, Chainer, etc.)
+  docker:
+    # image: philly/jobs/custom/generic-docker:py27
+    # registry: phillyregistry.azurecr.io
+    image: chunyl/pytorch-transformers:v0
+    registry: index.docker.io
+
+storage:
+  _default:
+    #use_phillyfs: True
+    storage_account_name: textae
+    container_name: bigtextae
+    mount_path: /mnt/_default
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  # $CONFIG_DIR is expanded to the directory of this config file
+  code_upload: False
+  remote_dir: code/
+  local_dir: $CONFIG_DIR/code
+
+#data:
+  # data upload is not required for this example
+  #data_upload: False
+
+search:
+  job_template:
+    name: vq_{experiment_name:s}_{bs_option:.0f}
+    sku: G4 # G4 # G1
+    command:
+    - pip install --user --editable .
+    - python examples/big_ae/run_lm_vae_pretraining.py --output_dir ../output/local_lm_vae_wiki2_bert_gpt --encoder_model_type bert --encoder_model_name_or_path bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2 --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir --per_gpu_train_batch_size {bs_option}
+  max_trials: 20
+  type: grid
+  params:
+    - name: bs_option
+      spec: discrete
+      values: [1] # [top,bottom]

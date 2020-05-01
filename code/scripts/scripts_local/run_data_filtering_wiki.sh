@@ -1,8 +1,8 @@
 export PYTHONPATH="${PYTHONPATH}:/workspace/code"
 
-export INPUT_FILE_PATH=../data/datasets/wikipedia_json_64_tmp/
-export OUTPUT_FILE_PATH=../data/datasets/wikipedia_json_64_tmp2/
-export OUTPUT_DIR=./output/local_wikipedia_overlength_filtering/
+export INPUT_FILE_PATH=../data/datasets/wikipedia_json_64/
+export OUTPUT_FILE_PATH=../data/datasets/wikipedia_json_64_filtered/
+export OUTPUT_DIR=./output/data_preprocessing/log_wikipedia_overlength_filtering/
 export GPU_ID=0,1
 
 CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_data_filtering.py \

@@ -239,6 +239,13 @@ def eval_dialog_response(generated_text_file_path):
     print('  2\t%.3f'%(inter_dist2/n))
     print('avg_L\t%.1f'%(avg_lens/n))
 
+    results = {
+        "BLEU_R": recall_bleu, "BLEU_P": prec_bleu, "BLEU_F1": f1, "BOW_A": bow_avg/n, "BOW_E": bow_extrema/n, "BOW_G": bow_greedy/n, "intra_dist1": intra_dist1/n, "intra_dist2": intra_dist2/n, "inter_dist1": inter_dist1/n, "inter_dist2": inter_dist2/n, "avg_L": avg_lens/n
+    }
+
+    return results
+
+
 
 def create_rand_baseline():
     path = 'data/datasets/dailydialog_data/test.txt'

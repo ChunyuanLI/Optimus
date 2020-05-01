@@ -1,0 +1,67 @@
+description: Evaluate VAE on Yelp Dataset
+
+auth:
+  # which virtual cluster you belong to (msrlabs, resrchprojvc6, etc.). Everyone has access to "pnrsy".
+  vc: msrlabs
+  # physical cluster to use (cam, gcr, rr1) or Azure clusters (eu1, eu2, etc.)
+  # cluster: rr2, eu2, eu1 et1 
+  cluster: eu2
+  # docker environment (vm) in which your job will run. we provide "generic" dockers
+  # with the main deep learning toolkit installed (PyTorch, TF, Chainer, etc.)
+  docker:
+    # image: philly/jobs/custom/generic-docker:py27
+    # registry: phillyregistry.azurecr.io
+    image: chunyl/pytorch-transformers:v0
+    registry: index.docker.io
+
+storage:
+  _default:
+    #use_phillyfs: True
+    storage_account_name: textae
+    container_name: bigtextae
+    mount_path: /mnt/_default
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  # $CONFIG_DIR is expanded to the directory of this config file
+  code_upload: False
+  remote_dir: code/
+  local_dir: $CONFIG_DIR/code
+
+#data:
+  # data upload is not required for this example
+  #data_upload: False
+
+search:
+  job_template:
+    name: exp_{experiment_name:s}_{bs_option:.0f}_b_{beta_option:.2f}
+    sku: G1 # G4 # G1
+    command:
+    - pip install --user --editable .
+    - pip install --user azure    
+    - pip install --user tqdm
+    - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta {beta_option} --dim_target_kl {dim_target_kl_option} --gloabl_step_eval 8334 --dataset Yelp --per_gpu_train_batch_size {bs_option} --per_gpu_eval_batch_size 1 --output_dir ../output/philly_vae_yelp_b{beta_option}_d{dim_target_kl_option}_r0{ratio_zero_option}_ra{ratio_increase_option} --encoder_model_type bert --encoder_model_name_or_path bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2 --train_data_file ../data/datasets/yelp_data/train.txt --do_eval --eval_data_file ../data/datasets/yelp_data/test.txt --overwrite_output_dir  --save_steps 1000 --logging_steps 100
+  max_trials: 20
+  type: grid
+  params:
+    - name: bs_option
+      spec: discrete
+      values: [4] # [top,bottom]
+    # - name: beta_option
+    #   spec: discrete
+    #   values: [0.25,1.0] # [top,bottom]
+    # - name: dim_target_kl_option
+    #   spec: discrete
+    #   values: [0.5,1.0,2.0] # [top,bottom]
+    - name: beta_option
+      spec: discrete
+      values: [0.25,1.0] # 
+    - name: dim_target_kl_option
+      spec: discrete
+      values: [0.01,0.05,0.1,0.25] # 
+    - name: ratio_zero_option
+      spec: discrete
+      values: [0.5] #
+    - name: ratio_increase_option
+      spec: discrete
+      values: [0.25] # 

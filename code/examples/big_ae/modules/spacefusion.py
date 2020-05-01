@@ -3,6 +3,10 @@ import numpy as np
 import torch, copy, pdb
 import torch.nn.functional as F
 
+from torch import nn
+
+import pdb
+
 
 def set_trainable(module, value):
     for param in module.parameters():
@@ -12,13 +16,17 @@ class SpaceFusion(VAE):
     def __init__(self, encoder, decoder,  tokenizer_encoder, tokenizer_decoder, args): 
         super(SpaceFusion, self).__init__(encoder, decoder,  tokenizer_encoder, tokenizer_decoder, args)
         children = [v for v in encoder.encoder.layer.children()]    # list of 12 BertLayer
-        self.S2S_layer = copy.deepcopy(children[-1])        # the last layer of encoder
+
+        self.num_s2s_bert_layer = args.num_s2s_bert_layer
+        self.S2S_layers = nn.ModuleList([copy.deepcopy(c) for c in children[-args.num_s2s_bert_layer:] ])    # the last layer of encoder
         self.S2S_pooler = copy.deepcopy(encoder.pooler)
         self.ix_turn_sep = tokenizer_encoder.convert_tokens_to_ids('[SEP]')
-        if args.freeze_bert11:
-            print('@'*20 + ' freezing first 11 layers')
-            for child in children:
+        if args.freeze_bert:
+            print('@'*20 + f' freezing BERT {args.num_frozen_bert_layer} layers')
+            for child in children[:args.num_frozen_bert_layer]:
                 set_trainable(child, False)
+
+
 
     def ids2speaker(self, ids):
         # 0 for speaker A, 1 for speaker B
@@ -38,11 +46,12 @@ class SpaceFusion(VAE):
 
         return torch.LongTensor(speaker).to(ids.device)
 
-    def forward(self, inputs_src, inputs_tgt, labels_tgt):  # [batch, time]
+    def forward(self, inputs_src, inputs_tgt, labels_tgt, return_vec=False):  # [batch, time]
         # toggle config to get desired encoder output
         self.encoder.encoder.output_attentions = False
         self.encoder.encoder.output_hidden_states = True
 
+        
         # AE encoder
         mask = (inputs_tgt > 0).float().to(inputs_src.device)
         outputs = self.encoder(inputs_tgt, attention_mask=mask)
@@ -54,11 +63,18 @@ class SpaceFusion(VAE):
         speaker = self.ids2speaker(inputs_src)
         outputs = self.encoder(inputs_src, attention_mask=mask, token_type_ids=speaker)
         _, _, all_layer_attn = outputs      # last_layer_attn, pooled, all_layer_attn = outputs
-        seq_z_prev = all_layer_attn[-2]     # seq of z at layer 11 ()
-        layer_outputs = self.S2S_layer(seq_z_prev, attention_mask=mask.unsqueeze(1).unsqueeze(1))
+        seq_z_prev = all_layer_attn[-self.num_s2s_bert_layer-1]     # seq of z at layer 11 ()
+
+        for s2s in self.S2S_layers: 
+            layer_outputs = s2s(seq_z_prev, attention_mask=mask.unsqueeze(1).unsqueeze(1))
+            seq_z_prev = layer_outputs[0]
+
         z_S2S = self.encoder.pooler(layer_outputs[0])
         z_S2S, _ = self.connect(z_S2S)
         z_S2S = z_S2S.squeeze(1)
+
+        if return_vec:
+            return z_AE, z_S2S
 
         # interpolation/smoothness
         u = torch.FloatTensor(np.random.random((z_AE.shape[0], 1))).to(inputs_tgt.device)
@@ -74,7 +90,7 @@ class SpaceFusion(VAE):
             past = z # past = self.decoder.linear(z)
             outputs = self.decoder(input_ids=labels_tgt, past=past, labels=labels_tgt, label_ignore=self.pad_token_id)
             if z_idx == 1:
-                loss_rec = loss_rec + 5.0 * outputs[0]
+                loss_rec = loss_rec + 1.0 * outputs[0]
             else:
                 loss_rec = loss_rec + outputs[0]
             z_idx += 1
@@ -99,12 +115,17 @@ class SpaceFusion(VAE):
         outputs = self.encoder(inputs_src, attention_mask=mask, token_type_ids=speaker)
 
         _, _, all_layer_attn = outputs      # last_layer_attn, pooled, all_layer_attn = outputs
-        seq_z_prev = all_layer_attn[-2]     # seq of z at layer 11 ()
-        layer_outputs = self.S2S_layer(seq_z_prev, attention_mask=mask.unsqueeze(1).unsqueeze(1))
+        # seq_z_prev = all_layer_attn[-2]     # seq of z at layer 11 ()
+        # layer_outputs = self.S2S_layer(seq_z_prev, attention_mask=mask.unsqueeze(1).unsqueeze(1))
+
+        seq_z_prev = all_layer_attn[-self.num_s2s_bert_layer-1]     # seq of z at layer 11 ()
+        for s2s in self.S2S_layers: 
+            layer_outputs = s2s(seq_z_prev, attention_mask=mask.unsqueeze(1).unsqueeze(1))
+            seq_z_prev = layer_outputs[0]
+
         z_S2S = self.encoder.pooler(layer_outputs[0])
         z_S2S, _ = self.connect(z_S2S)
         z_S2S = z_S2S.squeeze(1)
-
         
         return z_S2S
 

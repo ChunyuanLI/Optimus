@@ -1,0 +1,46 @@
+description: Train VQ on Bird Dataset
+
+auth:
+  # which virtual cluster you belong to (msrlabs, etc.). Everyone has access to "pnrsy".
+  vc: msrlabspvc12 # msrlabs
+  # physical cluster to use (cam, gcr, rr1) or Azure clusters (eu1, eu2, etc.)
+  # cluster: rr2, eu2, eu1 et1 
+  cluster: eu2
+  # docker environment (vm) in which your job will run. we provide "generic" dockers
+  # with the main deep learning toolkit installed (PyTorch, TF, Chainer, etc.)
+  docker:
+    # image: philly/jobs/custom/generic-docker:py27
+    # registry: phillyregistry.azurecr.io
+    image: vlnres/vqvae:v1 # chunyl/vqvae:v2
+    registry: index.docker.io
+
+storage:
+  _default:
+    #use_phillyfs: True
+    storage_account_name: sslm
+    container_name: vqvae
+    mount_path: /mnt/_default
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  # $CONFIG_DIR is expanded to the directory of this config file
+  code_upload: False
+  remote_dir: vq-vae-2-pytorch/
+  local_dir: $CONFIG_DIR/src
+
+#data:
+  # data upload is not required for this example
+  #data_upload: False
+
+search:
+  job_template:
+    name: vq_{experiment_name:s}_{image_size_option:.1f}
+    sku: G4 # G4 # G1
+    command:
+    - python train_vqvae.py --philly --dataset_name bird --size {image_size_option} --batch 512
+  max_trials: 20
+  type: grid
+  params:
+    - name: image_size_option
+      spec: discrete
+      values: [64,128] # [top,bottom]

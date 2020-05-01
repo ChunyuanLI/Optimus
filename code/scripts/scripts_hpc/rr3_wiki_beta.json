@@ -1,0 +1,44 @@
+{
+    "version": "2019-10-23",
+    "metadata": {
+        "name": "train_wikipedia_lvlm_b16_beta",
+        "cluster": "rr3",
+        "vc": "msrhyper"
+    },
+    "resources": {
+        "workers": {
+            "type": "skuResource",
+            "sku": "G16",
+            "count": 1,
+            "image": "index.docker.io/chunyl/pytorch-transformers:v1",
+            "commandLine": "cd /aztextae/code && python examples/big_ae/run_lm_vae_pretraining_phdist_beta.py --use_philly --num_train_epochs 1.0 --beta 1.0 --dim_target_kl 1.0 --ratio_zero 0.5 --ratio_increase 0.25 --dataset wikipedia --per_gpu_train_batch_size 16 --per_gpu_eval_batch_size 1 --block_size 128 --output_dir /aztextae/output/philly_rr3hyper_g16_vae_wikipedia_pretraining_beta_schedule_beta1.0_d1.0_ro0.5_ra0.25 --encoder_model_type bert --encoder_model_name_or_path /aztextae/data/models/bert-base-cased --decoder_model_type gpt2 --decoder_model_name_or_path /aztextae/data/models/gpt2 --do_train --train_data_file /aztextae/data/datasets/wikipedia_json_64_filtered --overwrite_output_dir --save_steps 20000 --logging_steps 100 --use_beta_schedule",
+            "constraints": [
+                {
+                    "type": "uniqueConstraint",
+                    "tag": "connectivityDomain"
+                }
+            ],
+            "containerArgs": {
+                "shmSize": "4G"
+            }
+        }
+    },
+    "volumes": {
+        "blob_out": {
+            "_comment": "This will mount testcontainer in the storage account pavermatest inside the container at path '/blob'. The credentials required for accessing storage account pavermatest are below, in the 'credentials' section.",
+            "type": "blobfuseVolume",
+            "storageAccount": "textae",
+            "containerName": "bigtextae",
+            "path": "/aztextae",
+            "options": ["-o", "allow_other"]
+        }
+    },
+    "credentials": {
+        "storageAccounts": {
+            "textae": {
+                "_comment": "Credentials for accessing 'pavermatest' storage account. Secrets can be saved with Philly from your Philly profile page at https://philly/#/userView/. With this the secret doesn't have to be maintained in the user's workspace.",
+                "keyKeyvaultSecretId": "https://phillyusersecrets.vault.azure.net:443/secrets/chunyl-textae/7fbf670d8d6943518656d8d0900559c3"
+            }
+        }
+    }
+}

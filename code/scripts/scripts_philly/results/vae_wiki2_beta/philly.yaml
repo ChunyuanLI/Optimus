@@ -1,0 +1,148 @@
+version: 4.1.8
+dry_run: false
+exp_name: vae_wiki2_beta
+description: Train VAE on Wiki2 Dataset
+timestamp: '2019-09-28T00:40:47.673194-07:00'
+auth:
+  cluster: eu2
+  vc: msrlabs
+  docker:
+    registry: index.docker.io
+    image: chunyl/pytorch-transformers:v0
+code:
+  local_dir: /home/chunyl/azure_mounts/textae_azure/code/scripts/scripts_philly/code
+  remote_dir: code/
+  code_zip: false
+  storage_id: _default
+data:
+  storage_id: _default
+search:
+  type: grid
+  max_trials: 20
+  params:
+  - name: bs_option
+    spec: discrete
+    values:
+    - 4
+  - name: beta_option
+    spec: discrete
+    values:
+    - 0.0
+    - 0.25
+    - 0.5
+    - 0.75
+    - 1.0
+  job_template:
+    name: vq_{experiment_name:s}_{bs_option:.0f}_b_{beta_option:.2f}
+    sku: G4
+    sku_count: 1
+    command:
+    - pip install --user --editable .
+    - pip install --user tqdm
+    - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta {beta_option}
+      --per_gpu_train_batch_size {bs_option} --output_dir ../output/philly_clm_wiki2_{beta_option}
+      --encoder_model_type bert --encoder_model_name_or_path bert-base-uncased --decoder_model_type
+      gpt2 --decoder_model_name_or_path gpt2 --do_train --train_data_file ../data/datasets/wikitext-2/train.txt
+      --do_eval --eval_data_file ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps
+      200 --logging_steps 100
+    submit_args: {}
+    tags: []
+    type: bash
+jobs:
+- name: vq_vae_wiki2_beta_4_b_1.00_abcg
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta 1.0 --per_gpu_train_batch_size
+    4 --output_dir ../output/philly_clm_wiki2_1.0 --encoder_model_type bert --encoder_model_name_or_path
+    bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2
+    --do_train --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file
+    ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps 200
+    --logging_steps 100
+  id: application_1568928610179_4442
+  results_dir: /mnt/_output/pt-results/2019-09-28/application_1568928610179_4442
+  submit_args: {}
+  tags: []
+  type: bash
+- name: vq_vae_wiki2_beta_4_b_0.50_abch
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta 0.5 --per_gpu_train_batch_size
+    4 --output_dir ../output/philly_clm_wiki2_0.5 --encoder_model_type bert --encoder_model_name_or_path
+    bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2
+    --do_train --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file
+    ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps 200
+    --logging_steps 100
+  id: application_1568928610179_4444
+  results_dir: /mnt/_output/pt-results/2019-09-28/application_1568928610179_4444
+  submit_args: {}
+  tags: []
+  type: bash
+- name: vq_vae_wiki2_beta_4_b_0.25_abcd
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta 0.25 --per_gpu_train_batch_size
+    4 --output_dir ../output/philly_clm_wiki2_0.25 --encoder_model_type bert --encoder_model_name_or_path
+    bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2
+    --do_train --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file
+    ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps 200
+    --logging_steps 100
+  id: application_1568928610179_4443
+  results_dir: /mnt/_output/pt-results/2019-09-28/application_1568928610179_4443
+  submit_args: {}
+  tags: []
+  type: bash
+- name: vq_vae_wiki2_beta_4_b_0.75_abce
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta 0.75 --per_gpu_train_batch_size
+    4 --output_dir ../output/philly_clm_wiki2_0.75 --encoder_model_type bert --encoder_model_name_or_path
+    bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2
+    --do_train --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file
+    ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps 200
+    --logging_steps 100
+  id: application_1568928610179_4445
+  results_dir: /mnt/_output/pt-results/2019-09-28/application_1568928610179_4445
+  submit_args: {}
+  tags: []
+  type: bash
+- name: vq_vae_wiki2_beta_4_b_0.00_abcf
+  sku: G4
+  sku_count: 1
+  command:
+  - pip install --user --editable .
+  - pip install --user tqdm
+  - python examples/big_ae/run_lm_vae_pretraining.py --use_philly --beta 0.0 --per_gpu_train_batch_size
+    4 --output_dir ../output/philly_clm_wiki2_0.0 --encoder_model_type bert --encoder_model_name_or_path
+    bert-base-uncased --decoder_model_type gpt2 --decoder_model_name_or_path gpt2
+    --do_train --train_data_file ../data/datasets/wikitext-2/train.txt --do_eval --eval_data_file
+    ../data/datasets/wikitext-2/valid.txt --overwrite_output_dir   --save_steps 200
+    --logging_steps 100
+  id: application_1568928610179_4446
+  results_dir: /mnt/_output/pt-results/2019-09-28/application_1568928610179_4446
+  submit_args: {}
+  tags: []
+  type: bash
+storage:
+  info:
+    _default:
+      container_name: bigtextae
+      use_phillyfs: false
+      mount_path: /mnt/_default
+      storage_account_name: textae
+    _output:
+      container_name: bigtextae
+      use_phillyfs: false
+      mount_path: /mnt/_output
+      storage_account_name: textae
