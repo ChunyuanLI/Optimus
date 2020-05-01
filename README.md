@@ -1,25 +1,33 @@
-# Optimus
+# Optimus: the first pre-trained Big VAE language model <img src="doc/figs/logo_optimus.png" width="80">  
 
 
-
-### Outline
-
-`code`: code and scripts to run the project in different computing environments
-
-`output`: checkpoints to save models and intermediate results (including our pre-trained models).
-
-`data`: various datasets and pre-processed versions.
+This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/abs/2004.04092).
 
 
-### Download Pre-trained model
+|<img src="doc/figs/optimus_scheme.png" width="350"> | <img src="doc/figs/headfig_optimus.png" width="800"> 
+|-------------------------|:-------------------------:|
+| The network architecture of Optimus: encoder for representation learning and decoder for generation | Sentences are organized and manipulated in a pre-trained compact and smooth latent space 
 
-```
-wget https://textae.file.core.windows.net/textae/textae.tar.gz?st=2019-11-23T00%3A21%3A21Z&se=2019-11-24T00%3A21%3A21Z&sp=rl&sv=2018-03-28&sr=f&sig=4jWG8Qks7lX8n0%2BLMmKNhnEpiV2CL1NqO2fwbzTEc1M%3D
-```
 
-Put the downloaded folder into `output`.
+For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/a-deep-generative-model-trifecta-three-advances-that-work-towards-harnessing-large-scale-power/).
 
-### Download and run Docker
+
+### [Code Cleaning in Progress, April 7, 2020]
+
+## Contents
+There are four steps to use this codebase to reproduce the results in the paper.
+
+1. [Dependencies](#dependencies)
+2. [Prepare datasets](#prepare-datasets)
+3. [Model training](#Model-training)
+    1. Pre-training on setences in Wikipedia
+    2. Languange Modeling
+    3. Guided Language Generation
+    4. Low-resource Language Understanding
+4. [Collect and plot results](#collect-and-plot-results)
+
+
+## Dependencies
 
 Pull docker from Docker Hub at: chunyl/pytorch-transformers:v2
 
@@ -30,25 +38,46 @@ CD into the directory "code", and run docker
     sh scripts/scripts_docker/run_docker.sh
   
 
-### Download GLUE datasets
+## Prepare Datasets
 
-Following HuggingFace repo, before running anyone of GLUE tasks, you should download the GLUE data by running this script and unpack it to directory data/datasets/glue_data/.
+Please the data preparation at links:
 
-(You may also install the additional packages required: pip install -r ./examples/requirements.txt)
+## Model Training
 
-### Run/Compare feature-based classification
+**1. Pre-training on setences in Wikipedia**
 
-Let's take QNLI for example (104k training instances, 5.4k validation instances). You should be able to see the following accuracy by run the scripts:
- 
-Optimus: acc = 0.7062
+**2. Languange Modeling**
 
-    sh scripts/scripts_local/run_vae_glue.sh
+**3. Guided Language Generation**
+
+**4. Low-resource Language Understanding**
+
+## Collect and Plot Results
+
+Once the networks are trained and the results are saved, we extracted key results using Python script. The results can be plotted using the included IPython notebook `plots/main_plots.ipynb`.
+Start the IPython Notebook server:
+
+```
+$ cd plots
+$ ipython notebook
+```
+
+Select the `main_plots.ipynb` notebook and execute the included
+code. Note that without modification, we have copyed our extracted results into the notebook, and script will output figures in the paper. If you've run your own training and wish to plot results, you'll have to organize your results in the same format instead.
 
 
-BERT: acc = 0.6624
+## Questions?
 
-    sh scripts/scripts_local/run_bert_glue.sh
+Please drop me ([Chunyuan](http://chunyuan.li/)) a line if you have any questions.
 
- 
+
+```
+@inproceedings{li2020_Optimus,
+  title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
+  author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao, Jianfeng},
+  booktitle={arXiv},
+  year={2020}
+}
+```
 
 
