@@ -28,7 +28,7 @@ The main training script is [`run_lm_vae_training.py`](./examples/big_ae/run_lm_
 - `--ratio_increase`:  the proportion of beta that increases from 0 to the maximum value in one period in cyclical annealing schedule used in fine-tuning(type=float); default 0.25.
 
 
-For more options, please see [`standard_parser.py`](./intrinsic_dim/standard_parser.py) and [`train.py`](./intrinsic_dim/train.py), or just run `./train.py -h`.
+For more options, please see [`run_lm_vae_training.py`](./examples/big_ae/run_lm_vae_training.py) and  see the examples we provided in [`run_ft_lm_vae_optimus.sh`](./scripts/scripts_local/run_ft_lm_vae_optimus.sh), or [more running scripts we used to run the code on a cluster](./scripts/scripts_philly).
 
 
 ## Play with the latent space
