@@ -13,5 +13,14 @@ CD into the directory "code", and run docker
   
 ## Fine-tune Language Models
 
+    sh scripts/scripts_local/run_ft_lm_vae_optimus.sh
+    
+    
+
 
 ## Play with the latent space
+
+
+    sh scripts/scripts_local/eval_optimus_latent_space.sh
+    
+    
