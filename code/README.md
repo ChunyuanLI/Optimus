@@ -7,4 +7,11 @@ Edit the project path to the absolute path on your computer by changing the "SCR
 CD into the directory "code", and run docker
 
     sh scripts/scripts_docker/run_docker.sh
+    
+    
+
   
+## Fine-tune Language Models
+
+
+## Play with the latent space
