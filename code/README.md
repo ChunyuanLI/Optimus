@@ -18,7 +18,6 @@ In this directory ("code"), and run docker
     
 The main training script is [`run_lm_vae_training.py`](./examples/big_ae/run_lm_vae_training.py) and conducts the fine-tuning loop, taking the following options (among others) as arguments:
 
-- The `two positional arguments` specify the paths for training and validation sets (two _hdf5_ files), respectively; these arguments are required.
 - `--checkpoint_dir`: the folder that the pre-trained Optimus is saved.
 - `--gloabl_step_eval`: it specifies the checkpoint (the steps that Optimus is trained).
 - `--train_data_file` and `--eval_data_file`: the path for training and testing datasets for the downstream fine-tuning.
@@ -39,4 +38,4 @@ For more options, please see [`run_lm_vae_training.py`](./examples/big_ae/run_lm
     
 The main training script is [`run_latent_generation.py`](./examples/big_ae/run_latent_generation.py) and evaluates the various ways to generate text conditioned on latent vectors, taking the following options (among others) as arguments:
 
-- `--play_mode`:  The current scripts supports two ways to play with the pre-trained VAE models. [`reconstrction` and `interpolation`]
+- `--play_mode`:  The current scripts supports two ways to play with the pre-trained VAE models: [`reconstrction`, `interpolation`]
