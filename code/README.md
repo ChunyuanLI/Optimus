@@ -35,7 +35,8 @@ For more options, please see [`run_lm_vae_training.py`](./examples/big_ae/run_lm
 
 ## Play with the latent space
 
-
     sh scripts/scripts_local/eval_optimus_latent_space.sh
     
-    
+The main training script is [`run_latent_generation.py`](./examples/big_ae/run_latent_generation.py) and evaluates the various ways to generate text conditioned on latent vectors, taking the following options (among others) as arguments:
+
+- `--play_mode`:  The current scripts supports two ways to play with the pre-trained VAE models. [`reconstrction` and `interpolation`]
