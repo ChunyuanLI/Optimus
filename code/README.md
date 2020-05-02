@@ -21,6 +21,8 @@ The main training script is [`run_lm_vae_training.py`](./examples/big_ae/run_lm_
 - The `two positional arguments` specify the paths for training and validation sets (two _hdf5_ files), respectively; these arguments are required.
 - `--checkpoint_dir`: the folder that the pre-trained Optimus is saved.
 - `--gloabl_step_eval`: it specifies the checkpoint (the steps that Optimus is trained).
+- `--train_data_file` and `--eval_data_file`: the path for training and testing datasets for the downstream fine-tuning.
+- `--dataset`: the dataset for fine-tuning. such as `Penn`
 - `--num_train_epochs`: number of training epochs (type=int); default 1.
 - `--dim_target_kl`:   the hyper-paramter used in dimension-wise thresholding used in fine-tuning(type=float); default 0.5.
 - `--beta`:   the maximum beta value used in cyclical annealing schedule used in fine-tuning(type=float); default 1.0.
