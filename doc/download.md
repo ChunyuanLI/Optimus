@@ -106,7 +106,46 @@ a woman is riding a moped on a street with large trees and other riders ride ove
 
 ```
 
-Reconstruction
+
+Reconstruction (beta = 0.5)
+```
+a football coach putting his arm on one of his player's shoulder.  
+ a football player putting his arm on another's shoulder, this one hispanic.
+
+ a girl wearing a white shirt and blue jeans jumping off a rock into the sand.  
+ a girl wearing a blue shirt and white jeans jumping off a rock into the sand.
+
+ a group of cheerleaders are making a human pyramid at a basketball game.  
+ a group of cheerleaders are making a human pyramid at a basketball game.
+
+ a man is looking over things that are in a local market.  
+ a man is looking over things that are in a local market.
+
+ a woman is riding a moped on a street with many other people riding mopeds behind her, while streamers and banners hang in the trees overhead.  
+ a woman is riding a moped on a street with many other people behind her, as well as small banners and horns riding in the background.
+
+ group of people in the wilderness packing boxes full of food.  
+ group of people in the wilderness packing boxes full of food.
+
+ man tries to impress girl by diving into the water.  
+ man tries to impress girl by diving into the water.
+
+ people in the middle of city street surrounded by large buildings.  
+ people in the middle of city streets surrounded by large buildings.
+
+ there are girls that are on the ice practicing their ice dancing.  
+ there are girls that are on the ice practicing their ice dancing.
+
+ there are two young boys with shovels who are outside and are digging in the dirt.  
+ there are two young boys with shovels who are outside and are digging in the dirt.
+
+ two men in blue one standing the other hanging onto the window of a tram car just looking out.  
+ two men in all blue standing the windowless car next to another man riding a blue roller coaster.
+```
+
+
+
+Reconstruction (beta = 1.0)
 ```
 a football coach putting his arm on one of his player's shoulder.  
  a football player extending his hand on the team football.
