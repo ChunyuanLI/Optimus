@@ -9,7 +9,7 @@ unzip $MODEL_NAME.zip -d $MODEL_NAME
 ```
 `MODEL_DIR` and `MODEL_NAME` could be different values. We currently release the following models;
 
-### A model with good latent space manipulation performance on SNLI dataset. 
+### A model with good latent space manipulation performance on SNLI dataset (beta=1.0). 
 ```bash
 
 wget https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
@@ -20,6 +20,15 @@ cd output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 
 unzip checkpoint-full-31250.zip -d checkpoint-full-31250
 ```
+
+Similarly, one may download models with with beta=0.0 and beta=0.5 at the following links:
+
+beta=0.0 
+https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+
+beta=0.5 
+https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+
 
 ### Play with the model
 
