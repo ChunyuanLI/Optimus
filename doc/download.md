@@ -207,7 +207,7 @@ a football coach putting his arm on one of his player's shoulder.
 
 
 
-### When beta changes from 0 to 1, the interpolation quality become better
+### When beta changes from 0 to 1, similar interpolation quality are observed:
 
 Interpolation (beta = 0.0)
 ```
