@@ -1,1 +1,1 @@
-# Fine-tuning Optimus on a downstream VAE language modeling task
+# Fine-tuning Optimus on a VAE language modeling task
