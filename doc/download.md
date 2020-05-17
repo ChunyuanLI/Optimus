@@ -81,7 +81,7 @@ Here are some results you can see from the model:
 
 
 
-***When beta changes from 0 to 1, the reconstruction quality become worse
+#### When beta changes from 0 to 1, the reconstruction quality become worse
 
 Reconstruction (beta = 0.0)
 ```
@@ -198,7 +198,7 @@ a football coach putting his arm on one of his player's shoulder.
 
 
 
-***When beta changes from 0 to 1, the interpolation quality become better
+### When beta changes from 0 to 1, the interpolation quality become better
 
 Interpolation (beta = 0.0)
 ```
