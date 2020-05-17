@@ -79,7 +79,35 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
 
 Here are some results you can see from the model:
 
-Interpolation
+
+Interpolation (beta = 0.5)
+```
+0 
+ a woman is riding a moped on a street with many other people behind her, as well as small banners and horns riding in the background.
+1 
+ a woman is riding a moped with several people on it behind her, riding a straw pole and streets in the background.
+2 
+ a woman riding a trolley is riding on a street with many people in front of them, as well as ripples surrounding it.
+3 
+ a woman riding a moped has two others standing in the street on side a bus as they weave, blowing bubbles on it.
+4 
+ one man riding a black stroller is riding on the street beside a man with painted windows and others populating in the background.
+5 
+ one man riding a pink bus is standing on the street behind another man making wheelie figures and the window in between them.
+6 
+ two men in a blue hoodie standing on one of the cars drives past people hanging a wicker window of the street.
+7 
+ two men in blue holding a wheelie standing on the street that are both winking into the windows next to them.
+8 
+ two men in pink standing on the street one of which is pulling a blue parasol to window it.
+9 
+ two men in the blue one person standing on a car leaning over it window dreaming of the other floating.
+10 
+ two men in blue that was standing next to the window holding one wheelie riding a black bike down the street.
+
+```
+
+Interpolation (beta = 1.0)
 ```
 0 
 a woman is riding a moped on a street with large trees and other riders ride over it as some sort of bob lights are passing behind her.
@@ -105,6 +133,7 @@ a woman is riding a moped on a street with large trees and other riders ride ove
  two men in blue holding each other standing the window of a one wheel bicycle trying out the tube.
 
 ```
+
 
 
 Reconstruction (beta = 0.5)
