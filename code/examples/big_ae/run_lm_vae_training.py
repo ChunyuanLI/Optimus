@@ -33,6 +33,7 @@ import random
 
 import numpy as np
 import torch
+import torch.nn.init as init
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler, TensorDataset
 from torch.utils.data.distributed import DistributedSampler
 from tensorboardX import SummaryWriter
@@ -51,7 +52,7 @@ from pytorch_transformers import (WEIGHTS_NAME, AdamW, WarmupLinearSchedule,
                                   OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
                                   RobertaConfig, RobertaForMaskedLM, RobertaTokenizer)
 
-from utils import (calc_iwnll, calc_rec, calc_mi, calc_au, BucketingDataLoader, TextDataset_Split, TextDataset_2Tokenizers, frange_cycle_linear, frange_cycle_zero_linear)
+from utils import (weight_init, calc_iwnll, calc_rec, calc_mi, calc_au, BucketingDataLoader, TextDataset_Split, TextDataset_2Tokenizers, frange_cycle_linear, frange_cycle_zero_linear)
 
 
 from modules import VAE
@@ -71,10 +72,6 @@ MODEL_CLASSES = {
 }
 
     
-storage_name="textae"
-key=r"6yBCXlblof8DVFJ4BD3eNFTrGQCej6cKfCf5z308cKnevyHaG+yl/m+ITVErB9yt0kvN3ToqxLIh0knJEfFmPA=="
-# ts = TableService(account_name=storage_name, account_key=key)
-
 
 def load_and_cache_examples(args, tokenizer, evaluate=False):
     if isinstance(tokenizer, list):
@@ -128,7 +125,14 @@ def mask_tokens(inputs, tokenizer, args):
     # The rest of the time (10% of the time) we keep the masked input tokens unchanged
     return inputs, labels
 
-
+def weights_init_rondom(model):
+    model = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
+    model_state_dict = model.state_dict()
+    for key in model_state_dict:
+        pdb.set_trace()
+        if 'encoder' in key:
+            init.normal_(model_state_dict[key].data)  
+        # weight_init(item)
 
 def save_checkpoint(model_vae, optimizer, global_step, args):
 
@@ -312,8 +316,6 @@ def train(args, train_dataloader, model_vae, encoder_tokenizer, decoder_tokenize
 
     global_step = 0
     tr_loss, logging_loss = 0.0, 0.0
-
-
     model_vae.zero_grad()
    
     # model_vae = model_vae.module if hasattr(model_vae, 'module') else model_vae  # Take care of distributed/parallel training   
@@ -576,6 +578,8 @@ def main():
                         help="The experiment name used in Azure Table.")
     parser.add_argument("--save_bert_gpt_init", action='store_true',
                         help="Use Philly for computing.")
+    parser.add_argument("--length_weighted_loss", action='store_true',
+                        help="Use sentence length re-weight the reconstruction loss.")
 
 
     ## Encoder options
@@ -669,6 +673,8 @@ def main():
                         help="Use Philly for computing.")
     parser.add_argument("--use_pretrained_vae", action='store_true',
                         help="Use use_pretrained_vae as initialization, where beta value is specified in the folder")
+    parser.add_argument("--use_random_weight", action='store_true',
+                        help="Use random weights as initialization")
 
 
     ## IO: Logging and Saving
@@ -845,6 +851,11 @@ def main():
     # model_decoder.to(args.device)
 
     model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args)
+
+    # pdb.set_trace()
+    if args.use_random_weight:
+        model_vae.apply(weights_init_rondom)
+
     if args.use_pretrained_model:
         model_vae.load_state_dict(checkpoint['model_state_dict'])
         logger.info("Pre-trained Optimus is successfully loaded")

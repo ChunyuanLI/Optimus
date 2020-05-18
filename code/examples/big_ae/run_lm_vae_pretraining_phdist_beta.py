@@ -45,6 +45,8 @@ from tqdm import tqdm, trange
 from collections import defaultdict
 import subprocess
 
+import torch.nn.init as init
+
 # from azure.cosmosdb.table.tableservice import TableService
 # from azure.cosmosdb.table.models import Entity
 from datetime import datetime
@@ -187,6 +189,14 @@ def set_seed(args):
     torch.manual_seed(args.seed)
     if args.n_gpu > 0:
         torch.cuda.manual_seed_all(args.seed)
+
+
+def weights_init_rondom(model):
+    model = model.module if hasattr(model, 'module') else model  # Take care of distributed/parallel training
+    model_state_dict = model.state_dict()
+    for key in model_state_dict:
+        init.normal_(model_state_dict[key].data)  
+
 
 def mask_tokens(inputs, tokenizer, args):
     """ Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original. """
@@ -553,6 +563,8 @@ def main():
                         help="Run evaluation during training at each logging step.")
     parser.add_argument("--do_lower_case", action='store_true',
                         help="Set this flag if you are using an uncased model.")
+    parser.add_argument("--use_random_weight", action='store_true',
+                        help="Use random weights as initialization")
 
 
     # Training Schedules
@@ -721,6 +733,8 @@ def main():
 
     model_vae = VAE(model_encoder, model_decoder, tokenizer_encoder, tokenizer_decoder, args).to(args.device) #
     #model_vae.cuda()
+    if args.use_random_weight:
+        model_vae.apply(weights_init_rondom)
 
     # Distributed training (should be after apex fp16 initialization)
     if args.distributed:

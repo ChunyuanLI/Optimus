@@ -101,7 +101,10 @@ class VAE(nn.Module):
         # logger.info(inputs)
         # logger.info(attention_mask)
         # logger.info(labels)
+        reconstrution_mask=(labels != 50257).float() # 50257 is the padding token for GPT2
+        sent_length = torch.sum(reconstrution_mask, dim=1)
 
+        
         outputs = self.encoder(inputs, attention_mask)
         pooled_hidden_fea = outputs[1]  # model outputs are always tuple in pytorch-transformers (see doc)
 
@@ -114,9 +117,7 @@ class VAE(nn.Module):
             # Decoding
             outputs = self.decoder(input_ids=labels, past=latent_z, labels=labels, label_ignore=self.pad_token_id)
             loss_rec = outputs[0]  # model outputs are always tuple in pytorch-transformers (see doc)
-
-            loss = loss_rec + self.args.beta * loss_kl 
-            
+    
         elif self.args.fb_mode==1:  
             # Connect hidden feature to the latent space
             mu, logvar = self.encoder.linear(pooled_hidden_fea).chunk(2, -1)
@@ -132,8 +133,6 @@ class VAE(nn.Module):
             outputs = self.decoder(input_ids=labels, past=latent_z, labels=labels, label_ignore=self.pad_token_id)
             loss_rec = outputs[0]  # model outputs are always tuple in pytorch-transformers (see doc)
 
-            loss = loss_rec + self.args.beta * loss_kl 
-
         elif self.args.fb_mode==2: 
             # Connect hidden feature to the latent space
             latent_z, loss_kl = self.connect_deterministic(pooled_hidden_fea)
@@ -144,8 +143,12 @@ class VAE(nn.Module):
             outputs = self.decoder(input_ids=labels, past=latent_z, labels=labels, label_ignore=self.pad_token_id)
             loss_rec = outputs[0]  # model outputs are always tuple in pytorch-transformers (see doc)
 
-            loss = loss_rec + self.args.beta * loss_kl 
             
+        # pdb.set_trace()
+        if self.args.length_weighted_loss:
+            loss = loss_rec / sent_length + self.args.beta * loss_kl
+        else:
+            loss = loss_rec + self.args.beta * loss_kl 
 
 
         return loss_rec, loss_kl, loss
@@ -432,7 +435,6 @@ class VAE(nn.Module):
 
             # [batch_size, 1]
             mask = (uniform_t < accept_prob).float()
-
             mask_ = mask.unsqueeze(2)
 
             cur = mask_ * next + (1 - mask_) * cur
