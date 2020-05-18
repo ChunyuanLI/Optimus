@@ -64,11 +64,13 @@ The project is organized into the following structures, with ensential files & f
 
 ## Prepare Datasets
 
-Please the data download or preparation at [`data/download_datasets.md`](data/download_datasets.md)
+Please download or preparation the data via following the instructions at [`data/download_datasets.md`](data/download_datasets.md). 
 
 ## Model Training
 
 **1. Pre-training on setences in Wikipedia**
+
+We pre-trained our models on Philly (a Microsoft internal compute cluster), the code is specialized for multi-node multi-GPU compute on this platform. The pre-training main python is [run_lm_vae_pretraining_phdist_beta.py](code/examples/big_ae/run_lm_vae_pretraining_phdist_beta.py). You may need to adjust the distributed training scripts. 
 
 **2. Languange Modeling**
 
