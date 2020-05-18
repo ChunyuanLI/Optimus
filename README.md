@@ -42,7 +42,13 @@ Please the data preparation at links:
 
 **2. Languange Modeling**
 
+To have a fair comparison with existing VAE languange models, we consider a model with latent dimension 32. The pre-trained model is fine-tuned on four commonly datasets for one epoch. Please see the details at [`doc/optimus_finetune_language_models.md`](doc/optimus_finetune_language_models.md)
+
 **3. Guided Language Generation**
+
+
+**Latent Space Manipulation** To ensure good performance, we consider a model with latent dimension 768. The pre-trained model is fine-tuned on SNLI dataset, where sentences show related patterns. Please see the details at 
+Please see the details at [`doc/optimius_for_snli.md`](doc/optimius_for_snli.md)
 
 **4. Low-resource Language Understanding**
 
