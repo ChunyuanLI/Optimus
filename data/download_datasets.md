@@ -26,6 +26,9 @@ https://textae.blob.core.windows.net/optimus/data/datasets/yelp_data.zip
 https://textae.blob.core.windows.net/optimus/data/datasets/yahoo_data.zip
 https://textae.blob.core.windows.net/optimus/data/datasets/snli_data.zip
 
+A tiny dataset is also provided for the purpose of debugging
+https://textae.blob.core.windows.net/optimus/data/datasets/debug_data.zip
+
 (Stylized) Dialog response generation: DailyDialog, Holmes
 
 
