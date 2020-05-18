@@ -1,6 +1,5 @@
-# Optimus: the first pre-trained Big VAE language model <img src="doc/figs/logo_optimus.png" width="80">  
-
-
+# Optimus: the first pre-trained Big VAE language model <img src="doc/figs/logo_optimus.png" width="80" align="right">  
+ 
 This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/abs/2004.04092).
 
 
