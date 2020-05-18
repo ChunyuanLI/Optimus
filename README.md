@@ -31,7 +31,7 @@ There are four steps to use this codebase to reproduce the results in the paper.
 
 Pull docker from Docker Hub at: `chunyl/pytorch-transformers:v2`. Please see the instruction at [`doc/env.md`](doc/env.md)
 
-The project is organized into the following structures:
+The project is organized into the following structures, with ensential files & folders visualized.  `output` saves the models checkpoints.
 ```
 ├── Optimus
    └── code
@@ -44,19 +44,18 @@ The project is organized into the following structures:
                ├── run_lm_vae_training.py
                └── ...
 	   ├── pytorch_transformers
-           ├── modeling_bert.py
-           ├── modeling_gpt2.py
-           └── ...
+               ├── modeling_bert.py
+               ├── modeling_gpt2.py
+               └── ...
        ├── scripts
            ├── scripts_docker
-	       ├── scripts_local
-	       ├── scripts_philly
-           └── ...
+	   ├── scripts_local
+	   ├── scripts_philly
    └── data
        └── datasets
            ├── wikipedia_json_64_filtered
                └── ...
-	       ├── snli_data
+	   ├── snli_data
            └── ...
    └── output
        ├── pretrain
