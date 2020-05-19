@@ -91,7 +91,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --play_mode reconstrction
 ```
 
-Please see the scripts I used to run the evaluation at [code/scripts/scripts_loca/eval_optimus_latent_space.sh](../code/scripts/scripts_loca/eval_optimus_latent_space.sh). Here are some results you can see from the model:
+Please see the scripts I used to run the evaluation at [code/scripts/scripts_local/eval_optimus_latent_space.sh](../code/scripts/scripts_local/eval_optimus_latent_space.sh). Here are some results you can see from the model:
 
 
 
