@@ -3,4 +3,6 @@ data/datasets/glue_data/train.tx
 data/datasets/glue_data/cached_lm_gpt_bert_256_train.jsont
 code/runs
 output/*
+code/pytorch_transformers/__pycache__/*
+code/examples/big_ae/modules/encoders/__pycache__/*
 

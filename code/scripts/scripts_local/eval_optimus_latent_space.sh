@@ -62,29 +62,29 @@ export GPU_ID=1
 
 
 # # reconstruction from pre-trained model on wiki
-CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
-    --dataset Debug \
-    --checkpoint_dir=../output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2 \
-    --output_dir=../output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2 \
-    --encoder_model_type=bert \
-    --encoder_model_name_or_path=bert-base-cased \
-    --decoder_model_type=gpt2 \
-    --decoder_model_name_or_path=gpt2 \
-    --train_data_file=$TRAIN_FILE \
-    --eval_data_file=$TEST_FILE \
-    --per_gpu_eval_batch_size=1 \
-    --gloabl_step_eval 400000 \
-    --block_size 100 \
-    --max_seq_length 100 \
-    --latent_size 32 \
-    --play_mode reconstrction
+# CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
+#     --dataset Debug \
+#     --checkpoint_dir=../output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2 \
+#     --output_dir=../output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2 \
+#     --encoder_model_type=bert \
+#     --encoder_model_name_or_path=bert-base-cased \
+#     --decoder_model_type=gpt2 \
+#     --decoder_model_name_or_path=gpt2 \
+#     --train_data_file=$TRAIN_FILE \
+#     --eval_data_file=$TEST_FILE \
+#     --per_gpu_eval_batch_size=1 \
+#     --gloabl_step_eval 400000 \
+#     --block_size 100 \
+#     --max_seq_length 100 \
+#     --latent_size 32 \
+#     --play_mode reconstrction
 
 
 
 # CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
 #     --dataset Debug \
-#     --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted \
-#     --output_dir=../output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted \
+#     --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+#     --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
 #     --encoder_model_type=bert \
 #     --encoder_model_name_or_path=bert-base-cased \
 #     --decoder_model_type=gpt2 \
@@ -100,22 +100,22 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
 #     --num_interpolation_steps 10
 
 # reconstrction
-# CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
-#     --dataset Debug \
-#     --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted \
-#     --output_dir=../output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted \
-#     --encoder_model_type=bert \
-#     --encoder_model_name_or_path=bert-base-cased \
-#     --decoder_model_type=gpt2 \
-#     --decoder_model_name_or_path=gpt2 \
-#     --train_data_file=$TRAIN_FILE \
-#     --eval_data_file=$TEST_FILE \
-#     --per_gpu_eval_batch_size=1 \
-#     --gloabl_step_eval 31250 \
-#     --block_size 100 \
-#     --max_seq_length 100 \
-#     --latent_size 768 \
-#     --play_mode reconstrction
+CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
+    --dataset Debug \
+    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --encoder_model_type=bert \
+    --encoder_model_name_or_path=bert-base-cased \
+    --decoder_model_type=gpt2 \
+    --decoder_model_name_or_path=gpt2 \
+    --train_data_file=$TRAIN_FILE \
+    --eval_data_file=$TEST_FILE \
+    --per_gpu_eval_batch_size=1 \
+    --gloabl_step_eval 31250 \
+    --block_size 100 \
+    --max_seq_length 100 \
+    --latent_size 768 \
+    --play_mode reconstrction
 
 
 
