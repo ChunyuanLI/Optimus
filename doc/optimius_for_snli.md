@@ -20,7 +20,7 @@ Each zip file contains three folders: `full`, `encoder` and `decoder`.
 
 wget https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
-mkdir output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
+mkdir -p output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 mv checkpoint-full-31250.zip output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 cd output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 
@@ -50,8 +50,8 @@ export GPU_ID=1
 
 CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --dataset Debug \
-    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted \
-    --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted \
+    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
     --encoder_model_type=bert \
     --encoder_model_name_or_path=bert-base-cased \
     --decoder_model_type=gpt2 \
@@ -75,8 +75,8 @@ Reconstruction
 # reconstrction
 CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --dataset Debug \
-    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted \
-    --output_dir=../output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted \
+    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --output_dir=../output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
     --encoder_model_type=bert \
     --encoder_model_name_or_path=bert-base-cased \
     --decoder_model_type=gpt2 \
@@ -91,8 +91,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --play_mode reconstrction
 ```
 
-
-Here are some results you can see from the model:
+Please see the scripts I used to run the evaluation at [code/scripts/scripts_loca/eval_optimus_latent_space.sh](../code/scripts/scripts_loca/eval_optimus_latent_space.sh). Here are some results you can see from the model:
 
 
 
