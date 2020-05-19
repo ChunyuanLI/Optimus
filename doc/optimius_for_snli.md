@@ -12,26 +12,28 @@ unzip $MODEL_NAME.zip -d $MODEL_NAME
 ## A model with good latent space manipulation performance on SNLI dataset. 
 
 To download a model with with beta=1.0 at the following link:
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
+
+Each zip file contains three folders: `full`, `encoder` and `decoder`.
 
 ```bash
 
-wget https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+wget https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 mkdir output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 mv checkpoint-full-31250.zip output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 cd output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 
-unzip checkpoint-full-31250.zip -d checkpoint-full-31250
+unzip checkpoint-31250.zip
 ```
 
 Similarly, one may download models with with beta=0.0 and beta=0.5 at the following links:
 
 beta=0.0 
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 beta=0.5 
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-full-31250.zip
+https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 
 ### Play with the model
