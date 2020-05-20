@@ -101,6 +101,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --num_interpolation_steps=10
 
 ```
+_Acknowledgement: the user interaction mode is updated with the suggestion from [summerstay](https://github.com/summerstay), in an issue [thread](https://github.com/ChunyuanLI/Optimus/issues/4)_
 
 ### Play with the my debugging dataset, without user inputs
 
@@ -133,6 +134,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
     --num_interpolation_steps 10
 
 ```
+
 
 
 Reconstruction
