@@ -185,6 +185,41 @@ def sample_sequence_conditional(model, length, context, past=None, num_samples=1
     return generated
 
 
+def latent_code_from_text(text, tokenizer_encoder, model_vae, args):
+    tokenized1 = tokenizer_encoder.encode(text)
+    tokenized1 = [101] + tokenized1 + [102]
+    coded1 = torch.Tensor([tokenized1])
+    coded1 =torch.Tensor.long(coded1)
+    with torch.no_grad():
+        x0 = coded1
+        x0 = x0.to(args.device)
+        pooled_hidden_fea = model_vae.encoder(x0, attention_mask=(x0 > 0).float())[1]
+        mean, logvar = model_vae.encoder.linear(pooled_hidden_fea).chunk(2, -1)
+        latent_z = mean.squeeze(1)  
+        coded_length = len(tokenized1)
+        return latent_z, coded_length
+
+def text_from_latent_code(latent_z, model_vae, args, tokenizer_decoder):
+    past = latent_z
+    context_tokens = tokenizer_decoder.encode('<BOS>')
+
+    length = 128 # maximum length, but not used 
+    out = sample_sequence_conditional(
+        model=model_vae.decoder,
+        context=context_tokens,
+        past=past,
+        length= length, # Chunyuan: Fix length; or use <EOS> to complete a sentence
+        temperature=args.temperature,
+        top_k=args.top_k,
+        top_p=args.top_p,
+        device=args.device,
+        decoder_tokenizer = tokenizer_decoder
+    )
+    text_x1 = tokenizer_decoder.decode(out[0,:].tolist(), clean_up_tokenization_spaces=True)
+    text_x1 = text_x1.split()[1:-1]
+    text_x1 = ' '.join(text_x1)
+    return text_x1
+
 
 # a wrapper function to choose between different play modes
 def evaluate_latent_space(args, model_vae, encoder_tokenizer, decoder_tokenizer, prefix=""):
@@ -344,6 +379,39 @@ def calc_interpolate(model_vae, eval_dataloader, encoder_tokenizer, decoder_toke
     return result
 
 
+def interpolate(model_vae, tokenizer_encoder, tokenizer_decoder, args):
+    # and then in the main function         
+    latent_z1, coded_length1 = latent_code_from_text(args.sent_source, tokenizer_encoder, model_vae, args)
+    latent_z2, coded_length2 = latent_code_from_text(args.sent_target, tokenizer_encoder, model_vae, args)
+
+    result = defaultdict(str)
+
+    num_steps = args.num_interpolation_steps + 1
+    for step in range(num_steps+1):
+        latent_z = latent_z1 + (latent_z2 - latent_z1) * step * 1.0/num_steps
+        
+        text_interpolate = text_from_latent_code(latent_z, model_vae, args, tokenizer_decoder)
+        result[step] = text_interpolate
+        print(text_interpolate)
+
+    return result
+
+
+def analogy(model_vae, tokenizer_encoder, tokenizer_decoder, args):
+        
+    latent_z1, coded_length1 = latent_code_from_text(args.sent_source, tokenizer_encoder, model_vae, args)
+    latent_z2, coded_length2 = latent_code_from_text(args.sent_target, tokenizer_encoder, model_vae, args)
+    latent_z3, coded_length3 = latent_code_from_text(args.sent_input, tokenizer_encoder, model_vae, args)
+    
+    result = defaultdict(str)
+
+    latent_z = latent_z3 + args.degree_to_target * (latent_z2 - latent_z1) 
+    
+    text_analogy = text_from_latent_code(latent_z, model_vae, args, tokenizer_decoder)
+    result[0] = text_analogy
+    print(text_analogy)
+
+    return result
 
 
 def main():
@@ -398,6 +466,12 @@ def main():
     parser.add_argument("--max_seq_length", default=512, type=int,
                         help="Optional input sequence length before tokenization. The sequence will be dropped if it is longer the max_seq_length")
 
+    # Interact with users
+    parser.add_argument("--interact_with_user_input", action='store_true', help="Use user input to interact_with.")
+    parser.add_argument("--sent_source", type=str, default="")
+    parser.add_argument("--sent_target", type=str, default="")
+    parser.add_argument("--sent_input", type=str, default="")
+    parser.add_argument("--degree_to_target", type=float, default="1.0")
 
     ## Variational auto-encoder
     parser.add_argument("--nz", default=32, type=int,
@@ -408,7 +482,7 @@ def main():
     parser.add_argument("--length", type=int, default=20)
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--top_k", type=int, default=0)
-    parser.add_argument("--top_p", type=float, default=0.9)
+    parser.add_argument("--top_p", type=float, default=1.0)
     parser.add_argument("--no_cuda", action='store_true',
                         help="Avoid using CUDA when available")
     parser.add_argument('--seed', type=int, default=42,
@@ -480,7 +554,23 @@ def main():
     logger.info("Pre-trained Optimus is successfully loaded")
     model_vae.to(args.device)
 
-    result = evaluate_latent_space(args, model_vae, tokenizer_encoder, tokenizer_decoder, prefix=global_step)
+    if args.interact_with_user_input:
+
+        if args.play_mode == 'interpolation':
+            if len(args.sent_source) > 0 and len(args.sent_source) > 0:
+                result = interpolate(model_vae, tokenizer_encoder, tokenizer_decoder, args)
+            else:
+                print('Please check: specify the source and target sentences!')
+
+        if args.play_mode == 'analogy':
+            if len(args.sent_source) > 0 and len(args.sent_source) > 0 and len(args.sent_input) > 0:
+                result = analogy(model_vae, tokenizer_encoder, tokenizer_decoder, args)
+            else:
+                print('Please check: specify the source, target and input analogy sentences!')
+
+
+    else:
+        result = evaluate_latent_space(args, model_vae, tokenizer_encoder, tokenizer_decoder, prefix=global_step)
 
 
 if __name__ == '__main__':
