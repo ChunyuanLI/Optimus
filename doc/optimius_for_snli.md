@@ -102,7 +102,7 @@ CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
 
 ```
 
-### Play with the model
+### Play with the my debugging dataset, without user inputs
 
 Interpolation
 
