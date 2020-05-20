@@ -36,6 +36,72 @@ beta=0.5
 https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 
+### Play with user input sentences
+
+The main training script is [`run_latent_generation.py`](../code/examples/big_ae/run_latent_generation.py) and conducts the fine-tuning loop, taking the following options (among others) as arguments:
+
+- `--interact_with_user_input`: it specifies the program will take user inputs
+- `--play_mode`: Two modes are supported: [`analogy`, `interpolation`]
+- `--sent_source` and `--sent_target`: the source and target sentences to interpolate in between, or to make an analogy
+- `--num_interpolation_steps`: the number of interpolated sentences between source and target sentences 
+- `--sent_input`: the input sentence that will be re-written with the analogy specified by the source and target sentences
+- `--degree_to_target`: (float type), the degree to which the analogy will made, default value is 1.0. 
+
+Here are two examples:
+
+```
+export PYTHONPATH="${PYTHONPATH}:/workspace/code"
+export TRAIN_FILE=../data/datasets/debug_data/train.txt
+export TEST_FILE=../data/datasets/debug_data/test.txt
+export GPU_ID=1
+
+# analogy
+CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
+    --dataset Debug \
+    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --encoder_model_type=bert \
+    --encoder_model_name_or_path=bert-base-cased \
+    --decoder_model_type=gpt2 \
+    --decoder_model_name_or_path=gpt2 \
+    --train_data_file=$TRAIN_FILE \
+    --eval_data_file=$TEST_FILE \
+    --per_gpu_eval_batch_size=1 \
+    --gloabl_step_eval 31250 \
+    --block_size 100 \
+    --max_seq_length 100 \
+    --latent_size 768 \
+    --interact_with_user_input \
+    --play_mode analogy \
+    --sent_source="a yellow cat likes to chase a long string ." \
+    --sent_target="a yellow cat likes to chase a short string ." \
+    --sent_input="a brown dog likes to eat long pasta ." \
+    --degree_to_target=1.0
+    
+# interpolation    
+CUDA_VISIBLE_DEVICES=$GPU_ID python examples/big_ae/run_latent_generation.py \
+    --dataset Debug \
+    --checkpoint_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --output_dir=../output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250 \
+    --encoder_model_type=bert \
+    --encoder_model_name_or_path=bert-base-cased \
+    --decoder_model_type=gpt2 \
+    --decoder_model_name_or_path=gpt2 \
+    --train_data_file=$TRAIN_FILE \
+    --eval_data_file=$TEST_FILE \
+    --per_gpu_eval_batch_size=1 \
+    --gloabl_step_eval 31250 \
+    --block_size 100 \
+    --max_seq_length 100 \
+    --latent_size 768 \
+    --interact_with_user_input \
+    --play_mode interpolation \
+    --sent_source="a yellow cat likes to chase a short string ." \
+    --sent_target="a brown dog likes to eat his food very slowly ." \
+    --num_interpolation_steps=10
+
+```
+
 ### Play with the model
 
 Interpolation
