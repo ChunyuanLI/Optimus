@@ -13,9 +13,9 @@ For more on this project, see the [Microsoft Research Blog post](https://www.mic
 
 ## News
 
-May 20, 2002: The latent space manipulation code is cleaned and released. See instructions at [`optimius_for_snli.md`](doc/optimius_for_snli.md)
+May 20, 2020: The latent space manipulation code is cleaned and released. See instructions at [`optimius_for_snli.md`](doc/optimius_for_snli.md)
 
-May 13, 2002: The fine-tuning code for langauge modeling is released. See instructions  at [`optimus_finetune_language_models.md`](doc/optimus_finetune_language_models.md)
+May 13, 2020: The fine-tuning code for langauge modeling is released. See instructions  at [`optimus_finetune_language_models.md`](doc/optimus_finetune_language_models.md)
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
