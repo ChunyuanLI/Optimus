@@ -9,6 +9,9 @@ unzip $MODEL_NAME.zip -d $MODEL_NAME
 ```
 `MODEL_DIR` and `MODEL_NAME` could be different values. We currently release the following models;
 
+
+Play with our [`demo`](http://40.71.23.172:8899/), including sentence interpolation and analogy.
+
 ## A model with good latent space manipulation performance on SNLI dataset. 
 
 To download a model with with beta=1.0 at the following link:
