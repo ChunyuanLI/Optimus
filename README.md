@@ -11,7 +11,11 @@ This repository contains source code necessary to reproduce the results presente
 For more on this project, see the [Microsoft Research Blog post](https://www.microsoft.com/en-us/research/blog/a-deep-generative-model-trifecta-three-advances-that-work-towards-harnessing-large-scale-power/).
 
 
-### [Code Cleaning in Progress, April 7, 2020]
+## News
+
+May 20, 2002: The latent space manipulation code is cleaned and released. See instructions [`here`](doc/optimius_for_snli.md)
+
+May 13, 2002: The fine-tuning code for langauge modeling is released. See instructions [`here`](doc/optimus_finetune_language_models.md)
 
 ## Contents
 There are four steps to use this codebase to reproduce the results in the paper.
