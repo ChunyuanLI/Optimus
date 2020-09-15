@@ -1,6 +1,6 @@
 # Optimus: the first pre-trained Big VAE language model <img src="doc/figs/logo_optimus.png" width="100" align="right">  
  
-This repository contains source code necessary to reproduce the results presented in the paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/abs/2004.04092).
+This repository contains source code necessary to reproduce the results presented in the EMNLP 2020 paper [Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space](https://arxiv.org/abs/2004.04092).
 
 
 |<img src="doc/figs/optimus_scheme.png" width="350"> | <img src="doc/figs/headfig_optimus.png" width="800"> 
@@ -113,7 +113,7 @@ Please drop me ([Chunyuan](http://chunyuan.li/)) a line if you have any question
 @inproceedings{li2020_Optimus,
   title={Optimus: Organizing Sentences via Pre-trained Modeling of a Latent Space},
   author={Li, Chunyuan and Gao, Xiang and Li, Yuan and Li, Xiujun and Peng, Baolin and Zhang, Yizhe and Gao, Jianfeng},
-  booktitle={arXiv},
+  booktitle={EMNLP},
   year={2020}
 }
 ```
