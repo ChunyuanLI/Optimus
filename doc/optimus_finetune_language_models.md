@@ -4,11 +4,21 @@ _Note: The latent vector size has a great impact on the model performance: small
 
 ##### Download a pre-trained model (pre-trained from Wikipedia). 
 
-beta=0
+beta=0, latent size = 32
 https://textae.blob.core.windows.net/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip
 
-beta=0.5
+beta=0.5, latent size = 32
 https://textae.blob.core.windows.net/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip
+
+beta=0.0, latent size = 768
+https://textae.blob.core.windows.net/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
+
+beta=0.5, latent size = 768
+https://textae.blob.core.windows.net/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
+
+beta=1.0, latent size = 768
+https://textae.blob.core.windows.net/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta1.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
+
 
 ```
 export PYTHONPATH="${PYTHONPATH}:/workspace/code"
