@@ -4,7 +4,7 @@
 _Note: We provide a series of pre-trained *Optimus* models of for different purpose, due to a trade-off between reconstruction capacity and prior regularization._
 
 ```bash
-wget https://textae.blob.core.windows.net/optimus/$MODEL_DIR/$MODEL_NAME.zip
+wget https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/$MODEL_DIR/$MODEL_NAME.zip
 unzip $MODEL_NAME.zip -d $MODEL_NAME
 ```
 `MODEL_DIR` and `MODEL_NAME` could be different values. We currently release the following models;
@@ -15,7 +15,7 @@ Play with our [`demo`](http://40.71.23.172:8899/), including sentence interpolat
 ## A model with good latent space manipulation performance on SNLI dataset. 
 
 To download a model with with beta=1.0 at the following link:
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 Each zip file contains three folders: `full`, `encoder` and `decoder`.
 
@@ -33,10 +33,10 @@ unzip checkpoint-31250.zip
 Similarly, one may download models with with beta=0.0 and beta=0.5 at the following links:
 
 beta=0.0 
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 beta=0.5 
-https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 
 ### Play with user input sentences
