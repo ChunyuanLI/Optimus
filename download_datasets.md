@@ -4,11 +4,11 @@
 
 Download processed files (11.78G) below, and unzip it (298 files)
 
-https://textae.blob.core.windows.net/optimus/data/datasets/wikipedia_json_64_filtered.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/data/datasets/wikipedia_json_64_filtered.zip
 
 Download raw file (11.79G):
 
-https://textae.blob.core.windows.net/optimus/data/datasets/wikipedia.segmented.nltk.txt
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/data/datasets/wikipedia.segmented.nltk.txt
 
 Our pre-processing protocal: We split the original wiki text into 298 files, and loop over files in one epoch.
 
@@ -25,10 +25,10 @@ The filtered files are saved in "data/datasets/wikipedia_json_64_filtered".
 
 Language Modeling: Penn, Yelp, Yahoo, Snli
 
-https://textae.blob.core.windows.net/optimus/data/datasets/penn_data.zip
-https://textae.blob.core.windows.net/optimus/data/datasets/yelp_data.zip
-https://textae.blob.core.windows.net/optimus/data/datasets/yahoo_data.zip
-https://textae.blob.core.windows.net/optimus/data/datasets/snli_data.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/data/datasets/penn_data.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/datasets/yelp_data.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/data/datasets/yahoo_data.zip
+https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/data/datasets/snli_data.zip
 
 (Stylized) Dialog response generation: DailyDialog, Holmes
 
