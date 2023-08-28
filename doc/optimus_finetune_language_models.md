@@ -4,20 +4,15 @@ _Note: The latent vector size has a great impact on the model performance: small
 
 ##### Download a pre-trained model (pre-trained from Wikipedia). 
 
-beta=0, latent size = 32
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip
 
-beta=0.5, latent size = 32
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip
+| Beta    | Latent size | Checkpoint |
+| -------- | ------- | ------- |
+| 0.0  | 32 | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)    |
+| 0.5  | 32 | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_32_v2/checkpoint-508523.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)      |
+| 0.0  | 768 | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)     |
+| 0.5  | 768 | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)  |
+| 1.0  | 768 | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta1.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)  |
 
-beta=0.0, latent size = 768
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
-
-beta=0.5, latent size = 768
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta0.5_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
-
-beta=1.0, latent size = 768
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/pretrain/philly_rr3_vc4_g8_base_vae_wikipedia_pretraining_beta_schedule_beta1.0_d1.0_ro0.5_ra0.25_768_v2/checkpoint-508523.zip
 
 
 ```
