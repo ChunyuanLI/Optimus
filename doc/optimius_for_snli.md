@@ -14,15 +14,17 @@ Play with our [`demo`](http://40.71.23.172:8899/), including sentence interpolat
 
 ## A model with good latent space manipulation performance on SNLI dataset. 
 
-To download a model with with beta=1.0 at the following link:
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
+To download a model checkpoint with different beta values in VAE, please download the following link. The checkpoints are on Azure Storage Blob, a SAS with Read permission is used.
+
+| Beta    | Checkpoint |
+| -------- | ------- |
+| 1.0  | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)    |
+| 0.5  | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)      |
+| 0.0  | [Checkpoint](https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip?sp=r&st=2023-08-28T00:40:43Z&se=3023-08-28T08:40:43Z&sv=2022-11-02&sr=c&sig=kUkSFqeHFfTeqxxpvqVdICCJupwODFwJprCAW2o4irE%3D)     |
 
 Each zip file contains three folders: `full`, `encoder` and `decoder`.
 
 ```bash
-
-wget https://textae.blob.core.windows.net/optimus/output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
-
 mkdir -p output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 mv checkpoint-31250.zip output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 cd output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
@@ -30,13 +32,6 @@ cd output/LM/Snli/768/philly_vae_snli_b1.0_d5_r00.5_ra0.25_length_weighted
 unzip checkpoint-31250.zip
 ```
 
-Similarly, one may download models with with beta=0.0 and beta=0.5 at the following links:
-
-beta=0.0 
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.0_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
-
-beta=0.5 
-https://chunylcus.blob.core.windows.net/machines/msrdl/optimus/output/LM/Snli/768/philly_vae_snli_b0.5_d5_r00.5_ra0.25_length_weighted/checkpoint-31250.zip
 
 
 ### Play with user input sentences
